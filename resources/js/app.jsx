@@ -380,7 +380,7 @@ export function Panel({
                         {demo && (
                             <a
                                 className="primary install-button"
-                                href="https://github.com/qualquer-de-tudo/qopenpanel-community"
+                                href="https://github.com/qualquer-de-tudo/openpanel-community"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 title={t("Instalar o OpenPanel pelo GitHub")}

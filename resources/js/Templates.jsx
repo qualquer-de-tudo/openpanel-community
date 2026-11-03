@@ -95,7 +95,7 @@ export default function Templates({
                 <h3>{t("Catálogo de templates")}</h3>
                 <a
                     className="text-button"
-                    href="https://github.com/qualquer-de-tudo/qopenpanel-community/blob/main/docs/TEMPLATES.md"
+                    href="https://github.com/qualquer-de-tudo/openpanel-community/blob/main/docs/TEMPLATES.md"
                     target="_blank"
                     rel="noopener noreferrer"
                 >

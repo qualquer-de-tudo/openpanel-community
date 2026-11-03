@@ -1,0 +1,4 @@
+providers:
+  - Inertia\ServiceProvider
+  - Laravel\Mcp\Server\McpServiceProvider
+  - QOpenPanel\Community\Providers\QOpenPanelServiceProvider

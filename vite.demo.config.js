@@ -28,6 +28,7 @@ for (const directory of fs
     }
 }
 export default defineConfig({
+    publicDir: false,
     define: { __QOPENPANEL_TEMPLATES__: JSON.stringify(templates) },
     root: ".",
     base: "./",

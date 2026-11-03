@@ -36,3 +36,9 @@ Thumbs.db
 /.ai-logs/
 /private-mcp/
 *.mcp-private.json
+
+# Never commit application scaffolding or local runtime data to the package.
+/app/
+/bootstrap/
+/public/
+/storage/

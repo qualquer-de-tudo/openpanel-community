@@ -28,7 +28,7 @@ O ZIP contém `qopenpanel-template.lock.json` com a identidade do pacote, versã
 
 ## Contribuir com um template
 
-1. Faça um fork e crie uma branch no [repositório](https://github.com/qualquer-de-tudo/qopenpanel-community).
+1. Faça um fork e crie uma branch no [repositório](https://github.com/qualquer-de-tudo/openpanel-community).
 2. Gere o arquivo inicial:
 
 ```bash
@@ -41,7 +41,7 @@ npm run templates:new -- meu-template 1.0.0 "Nome do autor"
 ```bash
 npm run templates:lock
 npm run templates:check
-php artisan test --filter=TemplatesTest
+composer test -- --filter=TemplatesTest
 node --test tests/Unit/templates-policy.test.mjs
 npm run build:demo
 ```

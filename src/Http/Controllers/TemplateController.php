@@ -54,7 +54,11 @@ class TemplateController extends Controller
         $installation = $installer->installation($resource);
         $manifest = $catalog->validate(json_decode($installation->manifest, true, 512, JSON_THROW_ON_ERROR));
         abort_unless(hash_equals($installation->digest, hash('sha256', $catalog->canonical($manifest))), 409);
-        $path = tempnam(storage_path('app/private'), 'template-');
+        $directory = storage_path('app/private');
+        if (! is_dir($directory)) {
+            mkdir($directory, 0700, true);
+        }
+        $path = tempnam($directory, 'template-');
         $zip = new ZipArchive;
         try {
             abort_unless($zip->open($path, ZipArchive::OVERWRITE) === true, 500);

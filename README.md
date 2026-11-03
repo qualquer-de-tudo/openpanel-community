@@ -1,18 +1,18 @@
-# qopenpanel-community
+# openpanel-community
 
 **Módulo Laravel gratuito e open source para organizar a hospedagem de aplicações Linux.** Laravel 13 + React + Inertia, com licença MIT.
 
-[Demo interativa](https://qualquer-de-tudo.github.io/qopenpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
+[Demo interativa](https://qualquer-de-tudo.github.io/openpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
-> **Versão 0.5.0-beta.1 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+> **Versão 0.6.0-beta.1 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
 ## Módulo instalável em Laravel
 
-O produto agora fica em `vendor`, com provider auto descoberto, autenticação, tabelas, rotas e assets próprios. Compatibilidade inicial: Laravel 13 e Inertia 3.7+. O Laravel da raiz é um ambiente de desenvolvimento.
+O produto agora fica em `vendor`, com provider auto descoberto, autenticação, tabelas, rotas e assets próprios. Compatibilidade inicial: Laravel 13 e Inertia 3.7+. O repositório contém somente o pacote, seus testes, frontend, documentação e infraestrutura de instalação; não inclui uma aplicação Laravel.
 
 ```bash
-composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/qopenpanel-community.git
-composer require "qualquer-de-tudo/qopenpanel-community:^0.5@beta"
+composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/openpanel-community.git
+composer require "qualquer-de-tudo/openpanel-community:^0.6@beta"
 php artisan qopenpanel:install --force
 ```
 
@@ -30,12 +30,11 @@ A demo usa a mesma interface React, com dados fictícios e operações de grava�
 
 ## Instalação rápida
 
-Em um servidor Linux com Git, Docker Engine e Compose 2.24.4 ou superior:
+Em Ubuntu ou Debian suportado, o instalador prepara as dependências automaticamente. Baixe o arquivo da release ou use curl, se já disponível:
 
 ```bash
-git clone https://github.com/qualquer-de-tudo/qopenpanel-community.git
-cd qopenpanel-community
-bash install.sh --private
+curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.6.0-beta.1/install.sh
+sudo bash install.sh --private
 ```
 
 Abra localmente `http://127.0.0.1:8080/qopenpanel/login`. Para acessar sua VPS, execute no seu computador:
@@ -69,29 +68,21 @@ O mesmo Compose pode ser utilizado em máquinas Linux com Docker na AWS EC2/Ligh
 
 O software não cobra licença. VPS, domínio, armazenamento, tráfego e serviços externos são cobrados conforme o provedor. Não prometemos infraestrutura gratuita.
 
-## Desenvolvimento
+## Desenvolvimento do pacote
 
-Requer PHP 8.3+, Composer, Node 24 e extensão SQLite.
+Requer PHP compatível com Laravel 13, Composer, Node 24 e extensões SQLite/ZIP. Não há aplicação Laravel nem `.env.example` na raiz: o Testbench fornece o ambiente dos testes.
 
 ```bash
 composer install
-cp .env.example .env
-php artisan key:generate
-php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
-php artisan migrate
 npm ci
+composer test
+composer templates:check
+node --test tests/Unit/*.test.mjs
 npm run build:package
-php artisan qopenpanel:install
-php artisan serve
-```
-
-Para atualizar a interface do módulo, execute `npm run build:package` e publique novamente `qopenpanel-assets`. Para construir e visualizar a demo: `npm run build:demo` e `npm run preview:demo`.
-
-```bash
-php artisan test
-npm run build
 npm run build:demo
 ```
+
+Versione os assets de `resources/dist` ao alterar a interface. Para prévia da demo: `npm run preview:demo`. Para testar o servidor completo: `bash install.sh --private` em uma máquina com as dependências disponíveis ou `sudo bash install.sh --private` num servidor Ubuntu/Debian novo.
 
 ## Licença e projeto
 

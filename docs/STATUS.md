@@ -36,3 +36,7 @@ Templates de projeto versionados, catálogo comunitário via pull requests, expo
 ## 0.5.0-beta.1 — módulo Composer
 
 Pacote auto descoberto em `vendor`, tabelas/guard/configuração isolados, assets compilados e instalador que cria Laravel limpo no Docker. Importação opt-in da base SQLite 0.4, preservando originais. Compatibilidade inicial Laravel 13/Inertia 3; Octane não homologado. Executor Linux e imposição física de cotas continuam pendentes. [Arquitetura e instalação](MODULE.md).
+
+## 0.6.0-beta.1 — pacote sem aplicação na raiz
+
+Repositório e pacote renomeados para openpanel-community. Boilerplate Laravel removido; testes isolados em Orchestra Testbench. Bootstrap automático via apt para Git/curl/CA e Docker Engine/Compose/Buildx em Ubuntu/Debian suportados. O Dockerfile cria Laravel na imagem e instala o módulo em vendor. O executor Linux dos serviços gerenciados continua pendente. [Instalação e migração do nome](BOOTSTRAP.md).

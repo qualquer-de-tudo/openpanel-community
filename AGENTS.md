@@ -5,7 +5,7 @@
 
 ## Foundational Context
 
-This application is a Laravel application running on PHP 8.5. Always use the APIs that match the installed major version of each package — do not assume a version.
+This repository is a Laravel package running on PHP 8.5, not an application skeleton. Never add a root artisan, app, bootstrap, public, or host configuration directory. Laravel for development tests comes from Orchestra Testbench; Laravel for the deployed panel is created inside Docker. Run tests with composer test and package Artisan commands with php vendor/bin/testbench. Always use the APIs that match the installed major version of each package — do not assume a version.
 
 Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.

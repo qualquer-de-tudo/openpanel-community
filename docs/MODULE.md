@@ -1,14 +1,14 @@
 # QOpenPanel como módulo Laravel
 
-A partir da 0.5.0-beta.1, o produto é o pacote Composer `qualquer-de-tudo/qopenpanel-community`, no namespace `QOpenPanel\Community`. O Laravel na raiz do repositório é um ambiente de desenvolvimento. O instalador de servidor cria outro Laravel limpo e instala o módulo em `vendor`.
+O produto é o pacote Composer `qualquer-de-tudo/openpanel-community`, no namespace `QOpenPanel\Community`. A partir da 0.6, não há aplicação Laravel na raiz: somente o pacote e ferramentas próprias de teste/build. O instalador de servidor cria outro Laravel limpo e instala o módulo em `vendor`.
 
 ## Em um Laravel existente
 
 Compatibilidade inicial: Laravel 13 (framework >=13.17) e Inertia Laravel 3.7+. A imagem validada usa PHP 8.5. Versões antigas e concorrência em Octane ainda não foram homologadas. Faça backup e teste em homologação antes de instalar num sistema existente.
 
 ```bash
-composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/qopenpanel-community.git
-composer require "qualquer-de-tudo/qopenpanel-community:^0.5@beta"
+composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/openpanel-community.git
+composer require "qualquer-de-tudo/openpanel-community:^0.6@beta"
 php artisan qopenpanel:install --force
 ```
 
@@ -24,11 +24,11 @@ A senha é solicitada sem eco. `qopenpanel:install` publica apenas `config/qopen
 
 ## Em uma VPS sem Laravel
 
-O host precisa de Git, Bash, Docker Engine e Compose >=2.24.4; não precisa de PHP, Composer, Node ou Laravel. O script não instala Docker nem modifica pacotes do sistema operacional.
+O host não precisa de PHP, Composer, Node ou Laravel. O instalador verifica e instala Git, curl, Docker Engine, Compose e Buildx em Ubuntu/Debian suportados, via apt e repositório oficial do Docker. Execute com root/sudo quando faltarem dependências. Veja [BOOTSTRAP.md](BOOTSTRAP.md) para baixar o script sem Git pré-instalado e conferir requisitos.
 
 ```bash
-git clone https://github.com/qualquer-de-tudo/qopenpanel-community.git
-cd qopenpanel-community
+git clone https://github.com/qualquer-de-tudo/openpanel-community.git
+cd openpanel-community
 bash install.sh --private --email admin@example.com --name "Administrador"
 ```
 
@@ -81,7 +81,7 @@ O arquivo `storage/app/qopenpanel-setup.json`, modo 600, contém apenas nome/e-m
 No host Laravel, faça backup antes e depois execute:
 
 ```bash
-composer update qualquer-de-tudo/qopenpanel-community --with-dependencies
+composer update qualquer-de-tudo/openpanel-community --with-dependencies
 php artisan qopenpanel:install --force
 php artisan config:clear
 php artisan route:clear
@@ -106,3 +106,5 @@ Acrescente os argumentos Compose de domínio/IP conforme a instalação. O coman
 O instalador sobe os serviços do painel. Não instala os serviços gerenciados do catálogo: executor Linux, deploy real, e-mail, WAF e imposição física de cotas continuam pendentes.
 
 No checkout de desenvolvimento, execute `npm run build:package` ao alterar o frontend e versione `resources/dist`. A demo continua usando `npm run build:demo`. O CI testa o módulo instalado em Laravel limpo, incluindo instalação, descoberta automática e caches de configuração/rotas.
+
+Para atualizar o nome Composer da versão 0.5 e preservar o checkout/volumes após a renomeação do repositório, siga [BOOTSTRAP.md](BOOTSTRAP.md#atualizar-instalações-anteriores). Os testes do pacote agora usam `composer test`; comandos Artisan de desenvolvimento usam `php vendor/bin/testbench`, sem uma aplicação Laravel na raiz.

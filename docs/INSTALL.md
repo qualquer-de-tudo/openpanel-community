@@ -1,12 +1,12 @@
 # Instalar em VPS ou servidor Linux
 
-> **0.5.0-beta.1:** o produto agora é um pacote Composer. Comece pelo [guia do módulo e do novo instalador](MODULE.md), que explica Laravel em `vendor`, identidade inicial, IP, domínio e importação da beta 0.4. Para modo privado, o fluxo abaixo continua disponível.
+> **0.6.0-beta.1:** o produto agora é um pacote Composer. Comece pelo [guia do módulo e do novo instalador](MODULE.md), que explica Laravel em `vendor`, identidade inicial, IP, domínio e importação da beta 0.4. Para modo privado, o fluxo abaixo continua disponível.
 
 ## Requisitos
 
 Use uma VM dedicada de avaliação, Ubuntu 24.04 LTS ou Debian com Docker Engine e o plugin Compose. Ponto de partida sugerido para construir a imagem: 2 vCPU, 2 GB RAM e 20 GB de disco; este é um dimensionamento inicial, não um benchmark. A carga futura dos serviços gerenciados não está incluída. A receita de domínio exige Compose >= 2.24.4 por usar `!override`.
 
-Instale o Docker pelo [guia oficial para Ubuntu](https://docs.docker.com/engine/install/ubuntu/) ou [Debian](https://docs.docker.com/engine/install/debian/), incluindo `docker-compose-plugin`. O instalador deste projeto não altera pacotes do host nem executa um script remoto como root.
+Instale o Docker pelo [guia oficial para Ubuntu](https://docs.docker.com/engine/install/ubuntu/) ou [Debian](https://docs.docker.com/engine/install/debian/), incluindo `docker-compose-plugin`. O novo instalador verifica e instala dependências por apt/repositório oficial quando necessário. Comece por [BOOTSTRAP.md](BOOTSTRAP.md); a instalação manual do Docker abaixo é uma alternativa.
 
 Verifique:
 
@@ -21,9 +21,8 @@ Os comandos abaixo pressupõem permissão para usar Docker. Caso seu operador ex
 ## Primeiro acesso por IP, sem exposição pública
 
 ```bash
-git clone https://github.com/qualquer-de-tudo/qopenpanel-community.git
-cd qopenpanel-community
-bash install.sh --private
+curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.6.0-beta.1/install.sh
+sudo bash install.sh --private
 ```
 
 O painel fica limitado a `127.0.0.1:8080` no servidor. No computador do administrador:

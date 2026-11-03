@@ -1,8 +1,8 @@
 # Publicação e demo
 
-Repositório: https://github.com/qualquer-de-tudo/qopenpanel-community
+Repositório: https://github.com/qualquer-de-tudo/openpanel-community
 
-Demo esperada após deployment do Pages: https://qualquer-de-tudo.github.io/qopenpanel-community/
+Demo esperada após deployment do Pages: https://qualquer-de-tudo.github.io/openpanel-community/
 
 ## GitHub Pages
 

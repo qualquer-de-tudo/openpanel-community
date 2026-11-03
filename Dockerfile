@@ -20,8 +20,8 @@ RUN composer create-project laravel/laravel /app '^13.0' --no-dev --no-interacti
     && cd /app \
     && cp .env.example .env \
     && touch database/database.sqlite \
-    && composer config repositories.qopenpanel '{"type":"path","url":"/opt/qopenpanel","options":{"symlink":false,"versions":{"qualquer-de-tudo/qopenpanel-community":"dev-main"}}}' \
-    && composer require qualquer-de-tudo/qopenpanel-community:dev-main --update-no-dev --no-interaction --optimize-autoloader \
+    && composer config repositories.qopenpanel '{"type":"path","url":"/opt/qopenpanel","options":{"symlink":false,"versions":{"qualquer-de-tudo/openpanel-community":"dev-main"}}}' \
+    && composer require qualquer-de-tudo/openpanel-community:dev-main --update-no-dev --no-interaction --optimize-autoloader \
     && php artisan vendor:publish --tag=qopenpanel-assets --force \
     && cp /opt/qopenpanel/docker/standalone-web.php routes/web.php \
     && mkdir -p docker \

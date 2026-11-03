@@ -22,21 +22,17 @@ jobs:
           node-version: "24"
           cache: npm
       - run: composer install --no-interaction --prefer-dist
-      - run: cp .env.example .env && php artisan key:generate
       - run: npm ci
       - run: npm run translations:check
-      - run: npm run test:i18n
-      - run: npm run build
       - run: npm run build:package
       - run: npm run build:demo
-      - run: php artisan test
-      - run: php artisan panel:templates-check
+      - run: composer test
+      - run: composer templates:check
       - name: Check published template versions
         env:
           TEMPLATE_BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
         run: node bin/templates-policy.mjs
-      - run: node --test tests/Unit/templates-policy.test.mjs
-      - run: node --test tests/Unit/mcp-bridge.test.mjs
+      - run: node --test tests/Unit/*.test.mjs
       - run: docker compose config --quiet
       - run: PANEL_DOMAIN=panel.example.com docker compose -f compose.yaml -f compose.production.yaml config --quiet
       - run: for script in install.sh docker/install.sh docker/entrypoint.sh; do bash -n "$script"; done
@@ -54,4 +50,14 @@ jobs:
           docker compose exec -T panel php artisan config:cache
           curl --fail --silent http://127.0.0.1:8080/qopenpanel/login > /tmp/panel-cached.html
           grep -q 'data-qopenpanel-path="/qopenpanel"' /tmp/panel-cached.html
-          docker compose exec -T panel composer show qualquer-de-tudo/qopenpanel-community --path
+          docker compose exec -T panel composer show qualquer-de-tudo/openpanel-community --path
+  bootstrap:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: ["ubuntu:24.04", "debian:13-slim"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual Docker prerequisites in a clean container
+        run: |
+          docker run --rm -v "$PWD/install.sh:/installer.sh:ro" "${{ matrix.image }}" bash -c 'source /installer.sh; op_install_packages; docker --version; docker compose version; docker buildx version'

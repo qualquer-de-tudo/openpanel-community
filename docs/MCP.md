@@ -53,7 +53,7 @@ Configuração do cliente MCP local, sem valores de chave:
     "qopenpanel": {
       "command": "node",
       "args": [
-        "/caminho/qopenpanel-community/bin/mcp-bridge.mjs",
+        "/caminho/openpanel-community/bin/mcp-bridge.mjs",
         "/diretorio/privado/client.mcp-private.json"
       ]
     }
