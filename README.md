@@ -6,6 +6,8 @@
 
 > **Versão 0.1 — MVP de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
+![Dashboard de demonstração do OpenPanel](docs/demo-preview.png)
+
 ## Demonstração gratuita
 
 A demo usa a mesma interface React, com dados fictícios e operações de gravação bloqueadas. Pode ser publicada gratuitamente no GitHub Pages por meio do workflow incluído. Nenhum acesso administrativo, segredo ou servidor é exposto na demo. [Como publicar](docs/PUBLISHING.md).
