@@ -1,0 +1,35 @@
+{
+    "sites": [
+        "Laravel",
+        "React",
+        "Next.js",
+        "WordPress",
+        "Nuxt",
+        "Static",
+        "Docker Compose"
+    ],
+    "services": [
+        "Nginx",
+        "Apache",
+        "OpenLiteSpeed",
+        "PHP",
+        "Node.js",
+        "npm",
+        "Bun",
+        "Composer"
+    ],
+    "databases": [
+        "PostgreSQL",
+        "MySQL",
+        "MariaDB",
+        "Redis",
+        "MongoDB",
+        "Valkey"
+    ],
+    "email": ["Mailpit", "Mailcow"],
+    "security": ["Fail2ban", "ClamAV", "ModSecurity", "CrowdSec"],
+    "certificates": ["Let’s Encrypt", "Cloudflare DNS"],
+    "proxy": ["HTTP proxy", "Reverse proxy"],
+    "crons": ["Cron"],
+    "integrations": ["GitHub", "GitLab", "OpenAI", "Anthropic"]
+}

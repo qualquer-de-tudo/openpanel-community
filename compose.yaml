@@ -1,0 +1,37 @@
+services:
+    panel:
+        build:
+            context: .
+            target: runtime
+        restart: unless-stopped
+        environment:
+            APP_NAME: OpenPanel
+            APP_ENV: production
+            APP_DEBUG: "false"
+            APP_LOCALE: pt_BR
+            APP_URL: "${PANEL_URL:-http://localhost:8080}"
+            DB_CONNECTION: sqlite
+            DB_DATABASE: /data/database.sqlite
+            SESSION_DRIVER: database
+            SESSION_SECURE_COOKIE: "${PANEL_SECURE_COOKIE:-false}"
+            LOG_CHANNEL: stderr
+        volumes:
+            - panel-data:/data
+    web:
+        build:
+            context: .
+            target: web
+        restart: unless-stopped
+        depends_on:
+            - panel
+        environment:
+            PANEL_HOST: ":8080"
+        ports:
+            - "${PANEL_BIND:-127.0.0.1}:${PANEL_PORT:-8080}:8080"
+        volumes:
+            - caddy-data:/data
+            - caddy-config:/config
+volumes:
+    panel-data:
+    caddy-data:
+    caddy-config:

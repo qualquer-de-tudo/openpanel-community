@@ -1,0 +1,10 @@
+{$PANEL_HOST::8080} {
+    root * /app/public
+    encode zstd gzip
+    php_fastcgi panel:9000
+    file_server
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+}
