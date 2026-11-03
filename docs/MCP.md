@@ -130,3 +130,5 @@ Referências técnicas: [Laravel MCP](https://laravel.com/framework/docs/mcp), [
 A ferramenta project_templates fornece catálogo, inspeção, instalação, atualização e rollback de templates fixados por versão. Gravação exige panel:write e versions:write. Consulte [templates da comunidade](TEMPLATES.md).
 
 Na 0.5, o endpoint acompanha `QOPENPANEL_PATH`. Concessões antigas podem precisar do novo endpoint no arquivo privado do cliente; nunca envie seu conteúdo ao modelo. Consulte [MODULE.md](MODULE.md) para importar a base anterior preservando a chave do cofre.
+
+Na 0.7, manutenção do host é reservada ao operador com sessão web e reautenticação nas atualizações. Os contextos MCP não podem despachar tarefas do broker, designar operadores ou obter o socket Docker. O cofre não é enviado ao scanner.

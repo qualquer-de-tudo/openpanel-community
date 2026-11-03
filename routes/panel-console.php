@@ -33,7 +33,10 @@ Artisan::command('panel:account {email} {--name=} {--disk=10240} {--memory=2048}
         return 1;
     }
     DB::transaction(function () use ($email, $password, $limits) {
+        DB::table('qopenpanel_setup')->where('id', 1)->lockForUpdate()->first();
+        $first = ! User::exists();
         $user = User::create(['name' => $this->option('name') ?: strstr($email, '@', true), 'email' => $email, 'password' => Hash::make($password)]);
+        $user->forceFill(['is_operator' => $first])->save();
         DB::table('qopenpanel_accounts')->insert(['user_id' => $user->id, 'disk_mb' => $limits['disk'], 'memory_mb' => $limits['memory'], 'project_limit' => $limits['projects'], 'database_limit' => $limits['databases'], 'created_at' => now(), 'updated_at' => now()]);
     });
     $this->info(__('Conta criada com workspace isolado e cotas.'));

@@ -115,6 +115,55 @@ op_docker() {
   if [[ "$OP_DOCKER_PRIVILEGED" == true ]]; then op_root docker "$@"; else command docker "$@"; fi
 }
 
+op_compose() {
+  local prefix=(compose) has_files=false
+  [[ -z "${OP_MANAGED_PROJECT:-}" ]] || prefix+=(--project-name "$OP_MANAGED_PROJECT")
+  while (($#)); do
+    case "$1" in
+      --env-file|-f|--project-name|--project-directory)
+        [[ "$1" != -f ]] || has_files=true
+        prefix+=("$1" "$2"); shift 2 ;;
+      *) break ;;
+    esac
+  done
+  [[ "$has_files" == true ]] || prefix+=(-f compose.yaml)
+  [[ ! -f compose.maintenance.yaml ]] || prefix+=(-f compose.maintenance.yaml)
+  op_docker "${prefix[@]}" "$@"
+}
+
+op_enable_maintenance() {
+  if [[ ! -d /run/systemd/system ]] || ! command -v systemctl >/dev/null 2>&1; then
+    echo 'Maintenance agent requires a Linux host with systemd; panel installation continues without host maintenance.'
+    return 0
+  fi
+  if op_docker info --format '{{json .SecurityOptions}}' | grep -q rootless; then
+    echo 'Host maintenance requires rootful Docker. Rootless panel installation continues without the maintenance agent.'
+    return 0
+  fi
+  if [[ ! -x /usr/bin/python3 ]]; then
+    op_detect_os
+    op_root env DEBIAN_FRONTEND=noninteractive apt-get update
+    op_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3
+  fi
+  if [[ -f /usr/local/lib/openpanel/host-agent.py ]] && op_root test -f /etc/openpanel/maintenance.json; then
+    local current
+    current=$(op_root python3 /usr/local/lib/openpanel/host-agent.py --current)
+    cd -- "$current"
+  fi
+  op_root install -d -m 0755 /usr/local/lib/openpanel
+  op_root install -m 0644 bin/host-agent.py /usr/local/lib/openpanel/host-agent.py
+  op_root python3 /usr/local/lib/openpanel/host-agent.py --configure "$PWD"
+  OP_MANAGED_PROJECT=$(op_root python3 /usr/local/lib/openpanel/host-agent.py --project)
+  op_root install -m 0644 docker/maintenance.service /etc/systemd/system/openpanel-maintenance.service
+  op_root install -m 0644 docker/maintenance.timer /etc/systemd/system/openpanel-maintenance.timer
+  op_root systemctl daemon-reload
+  op_root systemctl enable --now openpanel-maintenance.timer
+}
+
+op_is_package() {
+  [[ -f "$1/composer.json" && -f "$1/compose.yaml" ]] && grep -Eq '"name"[[:space:]]*:[[:space:]]*"qualquer-de-tudo/(qopenpanel-community|openpanel-community)"' "$1/composer.json"
+}
+
 main() {
 # No PHP, Composer, Node or Laravel is required on the host.
 check_only=false
@@ -153,44 +202,69 @@ if [[ -n "$address" ]]; then
   IFS=. read -r a b c d <<< "$address"
   for octet in "$a" "$b" "$c" "$d"; do ((10#$octet <= 255)) || { echo 'Invalid IPv4 address.' >&2; exit 1; }; done
 fi
-if [[ ! -t 0 && "$private" == false ]]; then echo 'Interactive terminal required for account creation. Use --private for an unattended, loopback-only installation.' >&2; exit 1; fi
+if [[ ! -t 0 && "$private" == false ]]; then
+  if { true </dev/tty; } 2>/dev/null; then exec </dev/tty;
+  else echo 'Use --private when there is no interactive terminal.' >&2; return 1; fi
+fi
 
 op_prepare_dependencies
 
-script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-if [[ -f "$script_dir/composer.json" && -f "$script_dir/compose.yaml" ]]; then
+script_dir=""
+if [[ -f "${BASH_SOURCE[0]:-}" ]]; then script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd); fi
+requested_version=${QOPENPANEL_VERSION:-v0.7.0-beta.1}
+[[ "$requested_version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|rc)\.[0-9]+)?$ ]] || { echo 'Invalid release tag.' >&2; return 1; }
+if [[ -n "$script_dir" ]] && op_is_package "$script_dir"; then
   cd -- "$script_dir"
+elif op_is_package "$PWD"; then
+  :
 else
   command -v git >/dev/null || { echo 'Git is required to download the package.' >&2; exit 1; }
   target=${QOPENPANEL_DIR:-"$PWD/openpanel-community"}
-  [[ ! -e "$target" ]] || { echo 'Destination already exists. Run install.sh from the existing project instead.' >&2; exit 1; }
-  git clone --branch "${QOPENPANEL_VERSION:-v0.6.0-beta.1}" --depth 1 https://github.com/qualquer-de-tudo/openpanel-community.git "$target"
+  if [[ -e "$target" ]]; then
+    op_is_package "$target" || { echo 'Destination exists and is not an OpenPanel installation.' >&2; return 1; }
+  else
+    git clone --branch "$requested_version" --depth 1 https://github.com/qualquer-de-tudo/openpanel-community.git "$target"
+  fi
   cd -- "$target"
 fi
 
-# Bootstrap stays private until an operator creates the first account.
-PANEL_BIND=127.0.0.1 PANEL_PORT=8080 PANEL_URL=http://127.0.0.1:8080 op_docker compose up -d --build
-ready=false
-for attempt in {1..60}; do
-  if op_docker compose exec -T panel php artisan migrate:status >/dev/null 2>&1; then ready=true; break; fi
-  sleep 2
-done
-[[ "$ready" == true ]] || { echo 'Startup failed. Inspect op_docker compose logs panel web.' >&2; exit 1; }
-
-if [[ "$private" == true && -n "$admin_email" && -n "$admin_name" ]]; then
-  op_docker compose exec -T panel php artisan qopenpanel:configure --name="$admin_name" --email="$admin_email"
+if [[ -f /usr/local/lib/openpanel/host-agent.py ]] && op_root test -f /etc/openpanel/maintenance.json; then
+  op_root python3 /usr/local/lib/openpanel/host-agent.py --check-target "$requested_version"
+  current=$(op_root python3 /usr/local/lib/openpanel/host-agent.py --current)
+  cd -- "$current"
+fi
+source_tag=$(sed -nE 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/v\1/p' resources/data/release.json)
+if [[ "$source_tag" != "$requested_version" ]]; then
+  [[ -z "$(git status --porcelain --untracked-files=no)" ]] || { echo 'Tracked files were modified. Preserve those changes before updating.' >&2; return 1; }
+  git fetch --depth 1 https://github.com/qualquer-de-tudo/openpanel-community.git tag "$requested_version"
+  git checkout --detach "$requested_version"
 fi
 
-if [[ "$private" == false ]] && ! op_docker compose exec -T panel php artisan qopenpanel:install --check; then
-  if op_docker compose exec -T panel php artisan qopenpanel:install --check-legacy; then
+op_enable_maintenance
+
+# Bootstrap stays private until an operator creates the first account.
+PANEL_BIND=127.0.0.1 PANEL_PORT=8080 PANEL_URL=http://127.0.0.1:8080 op_compose up -d --build
+ready=false
+for attempt in {1..60}; do
+  if op_compose exec -T panel php artisan migrate:status >/dev/null 2>&1; then ready=true; break; fi
+  sleep 2
+done
+[[ "$ready" == true ]] || { echo 'Startup failed. Inspect op_compose logs panel web.' >&2; exit 1; }
+
+if [[ "$private" == true && -n "$admin_email" && -n "$admin_name" ]]; then
+  op_compose exec -T panel php artisan qopenpanel:configure --name="$admin_name" --email="$admin_email"
+fi
+
+if [[ "$private" == false ]] && ! op_compose exec -T panel php artisan qopenpanel:install --check; then
+  if op_compose exec -T panel php artisan qopenpanel:install --check-legacy; then
     echo 'Legacy 0.4 data detected. Back up, preserve APP_KEY and run qopenpanel:import-legacy --force before creating an account. See docs/MODULE.md.' >&2
     exit 1
   fi
   [[ -n "$admin_email" ]] || read -r -p 'Administrator email: ' admin_email
   [[ -n "$admin_name" ]] || read -r -p 'Administrator name: ' admin_name
-  op_docker compose exec panel php artisan qopenpanel:configure --name="$admin_name" --email="$admin_email"
+  op_compose exec panel php artisan qopenpanel:configure --name="$admin_name" --email="$admin_email"
   echo 'Choose the account password in the following hidden terminal prompt.'
-  op_docker compose exec panel php artisan panel:account "$admin_email" --name="$admin_name"
+  op_compose exec panel php artisan panel:account "$admin_email" --name="$admin_name"
 elif [[ "$private" == true ]]; then
   echo 'Private installation ready. Create the first account at http://127.0.0.1:8080/qopenpanel/login through an SSH tunnel.'
   echo 'Tunnel: ssh -L 8080:127.0.0.1:8080 operator@SERVER_IP'
@@ -201,12 +275,12 @@ mkdir -p backups
 [[ ! -f deploy.env ]] || cp -p deploy.env "backups/deploy-$(date +%Y%m%d-%H%M%S).env"
 if [[ -n "$domain" ]]; then
   printf 'PANEL_DOMAIN=%s\n' "$domain" > deploy.env
-  op_docker compose --env-file deploy.env -f compose.yaml -f compose.production.yaml config --quiet
-  op_docker compose --env-file deploy.env -f compose.yaml -f compose.production.yaml up -d
+  op_compose --env-file deploy.env -f compose.yaml -f compose.production.yaml config --quiet
+  op_compose --env-file deploy.env -f compose.yaml -f compose.production.yaml up -d
   echo "QOpenPanel: https://$domain/qopenpanel (DNS must already point to this server; ports 80 and 443 must be reachable.)"
 elif [[ -n "$address" ]]; then
   printf 'PANEL_BIND=0.0.0.0\nPANEL_PORT=8080\nPANEL_URL=http://%s:8080\n' "$address" > deploy.env
-  op_docker compose --env-file deploy.env up -d
+  op_compose --env-file deploy.env up -d
   echo "QOpenPanel: http://$address:8080/qopenpanel"
   echo 'IP mode uses HTTP. Restrict access to a trusted network or use an SSH tunnel until HTTPS is configured.'
 else
@@ -215,4 +289,4 @@ fi
 
 }
 
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi
+if [[ -z "${BASH_SOURCE[0]:-}" || "${BASH_SOURCE[0]:-}" == "$0" ]]; then main "$@"; exit $?; fi

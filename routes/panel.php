@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use QOpenPanel\Community\Http\Controllers\MaintenanceController;
 use QOpenPanel\Community\Http\Controllers\PanelController as Panel;
 use QOpenPanel\Community\Http\Controllers\TemplateController;
 use QOpenPanel\Community\Http\Middleware\HandleInertiaRequests;
@@ -14,6 +15,8 @@ Route::prefix(config('qopenpanel.path'))->name('qopenpanel.')->middleware(['web'
     Route::post('setup', [Panel::class, 'setup'])->middleware('throttle:3,1');
     Route::middleware(RequirePanelUser::class)->group(function () {
         Route::get('/', [Panel::class, 'index'])->name('home');
+        Route::get('maintenance/releases', [MaintenanceController::class, 'releases'])->middleware('throttle:openpanel-maintenance-read');
+        Route::post('maintenance/request', [MaintenanceController::class, 'request'])->middleware('throttle:openpanel-maintenance-write');
         Route::post('logout', [Panel::class, 'logout']);
         Route::post('resources', [Panel::class, 'store']);
         Route::delete('resources/{resource}', [Panel::class, 'destroy']);

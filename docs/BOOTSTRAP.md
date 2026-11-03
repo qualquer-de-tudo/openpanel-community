@@ -7,7 +7,7 @@ O repositório contém o pacote, não uma aplicação Laravel. `install.sh` veri
 Baixe `install.sh` da release e execute com Bash. Se curl já estiver disponível:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.6.0-beta.1/install.sh
+curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.7.0-beta.1/install.sh
 sudo bash install.sh --private
 ```
 
@@ -59,7 +59,7 @@ Na imagem independente, o pacote é reinstalado durante o build, preservando os 
 ```bash
 composer remove qualquer-de-tudo/qopenpanel-community --no-update
 composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/openpanel-community.git
-composer require "qualquer-de-tudo/openpanel-community:^0.6@beta" --with-all-dependencies
+composer require "qualquer-de-tudo/openpanel-community:^0.7@beta" --with-all-dependencies
 php artisan qopenpanel:install --force
 php artisan config:clear
 php artisan route:clear
@@ -68,3 +68,5 @@ php artisan route:clear
 Faça backup antes. Namespace, tabelas e caminhos internos `qopenpanel` continuam estáveis. A base 0.4 requer a importação explícita documentada em [MODULE.md](MODULE.md). Em um Laravel já existente, o instalador de VPS não é necessário: use somente o Composer.
 
 Referências do bootstrap: [Docker no Ubuntu](https://docs.docker.com/engine/install/ubuntu/) e [Docker no Debian](https://docs.docker.com/engine/install/debian/).
+
+A partir da 0.7, também é possível executar pelo pipe, sem salvar o script ou clonar o repositório manualmente. O instalador registra manutenção restrita em Linux/systemd/Docker rootful. Consulte [MAINTENANCE.md](MAINTENANCE.md) para o comando único, atualizações pelo painel e CVEs.

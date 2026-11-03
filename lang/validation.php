@@ -7,6 +7,7 @@ return [
     'string' => __('O campo :attribute deve ser um texto.'),
     'email' => __('Informe um e-mail válido.'),
     'confirmed' => __('A confirmação de :attribute não confere.'),
+    'accepted' => __('O campo :attribute deve ser aceito.'),
     'unique' => __('Este :attribute já está em uso.'),
     'in' => __('Escolha uma opção válida para :attribute.'),
     'integer' => __('O campo :attribute deve ser um número inteiro.'),
@@ -22,5 +23,6 @@ return [
         'engine' => __('Stack'), 'disk_mb' => __('Reserva de disco'), 'action' => __('Ação'),
         'resource_id' => __('PROJETO / RECURSO'), 'reference' => __('Referência'),
         'expected_revision' => __('Revisão esperada'), 'variable' => __('Variável'),
+        'acknowledge' => __('Autorização'), 'channel' => __('Canal de versões'), 'version' => __('Versão'),
     ],
 ];

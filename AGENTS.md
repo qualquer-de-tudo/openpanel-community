@@ -22,4 +22,7 @@ This repository contains a Laravel package, not a Laravel application. Do not ad
 - Run node --test tests/Unit/*.test.mjs for JavaScript, installer and distribution tests.
 - Run npm run translations:check, npm run build:package and npm run build:demo when affected. Commit the built module assets in resources/dist.
 - The installer must preserve existing host packages/workloads on conflicts and use official signed package repositories. Never add automatic destructive cleanup or silently grant Docker-group privileges.
+- Host maintenance must remain operator-only, refuse MCP contexts and never mount a Docker socket in the web application. Revalidate queued requests and operator permission before execution.
+- Preserve the broker protocol and local CLI compatibility. Accept only official releases pinned to a commit with successful CI. Never accept free-form shell commands, repository URLs or image names from jobs.
+- Back up data and test candidates with unpublished ports. Never restore an older database automatically once public promotion begins. Keep existing deployment names, volumes, encryption keys and operator identity.
 - Do not claim real Linux provisioning, physical quotas, or cloud certification where the executor or validation is absent.

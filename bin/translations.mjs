@@ -81,7 +81,7 @@ if (action === "add") {
     if (action === "check") {
         for (const file of [
             "resources/js/app.jsx",
-            "resources/js/Templates.jsx",
+            "resources/js/Templates.jsx", "resources/js/Maintenance.jsx",
         ]) {
             const source = fs.readFileSync(file, "utf8");
             const { ast } = await prettier.__debug.parse(source, {

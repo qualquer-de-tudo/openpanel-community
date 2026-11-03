@@ -4,7 +4,7 @@
 
 [Demo interativa](https://qualquer-de-tudo.github.io/openpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
-> **Versão 0.6.0-beta.1 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+> **Versão 0.7.0-beta.1 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
 ## Módulo instalável em Laravel
 
@@ -12,7 +12,7 @@ O produto agora fica em `vendor`, com provider auto descoberto, autenticação, 
 
 ```bash
 composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/openpanel-community.git
-composer require "qualquer-de-tudo/openpanel-community:^0.6@beta"
+composer require "qualquer-de-tudo/openpanel-community:^0.7@beta"
 php artisan qopenpanel:install --force
 ```
 
@@ -33,8 +33,7 @@ A demo usa a mesma interface React, com dados fictícios e operações de grava�
 Em Ubuntu ou Debian suportado, o instalador prepara as dependências automaticamente. Baixe o arquivo da release ou use curl, se já disponível:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.6.0-beta.1/install.sh
-sudo bash install.sh --private
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/main/install.sh | sudo bash -s -- --private
 ```
 
 Abra localmente `http://127.0.0.1:8080/qopenpanel/login`. Para acessar sua VPS, execute no seu computador:
@@ -44,6 +43,10 @@ ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR
 ```
 
 Crie sua conta pelo túnel antes de publicar o domínio. Não há senha padrão. Para domínio e HTTPS automático, siga [o guia de instalação](docs/INSTALL.md). O painel utiliza PHP-FPM e Caddy; a porta FastCGI não é publicada.
+
+## Atualizações e segurança no painel
+
+A conta operadora tem uma página para consultar releases oficiais, solicitar atualização com senha/consentimento e executar verificações de CVEs de pacotes do host Ubuntu/Debian. O agente restrito usa systemd e Docker rootful; o painel não recebe socket Docker. Backups e testes precedem a publicação do candidato. [Operação, limites, permissões e recuperação](docs/MAINTENANCE.md).
 
 ## O que já funciona
 

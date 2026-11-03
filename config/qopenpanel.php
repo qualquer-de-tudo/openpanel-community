@@ -3,6 +3,7 @@
 use QOpenPanel\Community\Providers\QOpenPanelServiceProvider;
 
 return [
+    'maintenance_path' => env('OPENPANEL_CONTROL_PATH'),
     'path' => env('QOPENPANEL_PATH', 'qopenpanel'),
     'setup' => ['name' => env('QOPENPANEL_ADMIN_NAME', ''), 'email' => env('QOPENPANEL_ADMIN_EMAIL', '')],
     'catalog' => json_decode(file_get_contents(QOpenPanelServiceProvider::path('resources/data/catalog.json')), true, 512, JSON_THROW_ON_ERROR),

@@ -42,3 +42,6 @@ Thumbs.db
 /bootstrap/
 /public/
 /storage/
+
+/compose.maintenance.yaml
+__pycache__/

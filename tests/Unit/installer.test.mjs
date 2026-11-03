@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 
@@ -21,6 +21,12 @@ test("sourcing installer does not install or start anything", () => {
     const result = run("echo loaded");
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout.trim(), "loaded");
+});
+
+test("installer can execute directly from stdin without a local script or checkout", () => {
+    const result = spawnSync(bash, ["-s", "--", "--help"], { input: readFileSync(installer, "utf8"), encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /Usage: bash install.sh/);
 });
 
 test("Compose version gate accepts supported versions and rejects old or malformed output", () => {

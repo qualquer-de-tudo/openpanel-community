@@ -15,4 +15,5 @@ if [ ! -L storage/app ]; then
   ln -s /data/storage storage/app
 fi
 php artisan migrate --force
+touch /tmp/openpanel-ready
 exec php-fpm -F

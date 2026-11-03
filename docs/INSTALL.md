@@ -1,6 +1,6 @@
 # Instalar em VPS ou servidor Linux
 
-> **0.6.0-beta.1:** o produto agora é um pacote Composer. Comece pelo [guia do módulo e do novo instalador](MODULE.md), que explica Laravel em `vendor`, identidade inicial, IP, domínio e importação da beta 0.4. Para modo privado, o fluxo abaixo continua disponível.
+> **0.7.0-beta.1:** o produto agora é um pacote Composer. Comece pelo [guia do módulo e do novo instalador](MODULE.md), que explica Laravel em `vendor`, identidade inicial, IP, domínio e importação da beta 0.4. Para modo privado, o fluxo abaixo continua disponível.
 
 ## Requisitos
 
@@ -21,7 +21,7 @@ Os comandos abaixo pressupõem permissão para usar Docker. Caso seu operador ex
 ## Primeiro acesso por IP, sem exposição pública
 
 ```bash
-curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.6.0-beta.1/install.sh
+curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.7.0-beta.1/install.sh
 sudo bash install.sh --private
 ```
 
@@ -115,3 +115,5 @@ Preserve também `deploy.env` e uma cópia protegida dos volumes do Caddy confor
 ## Validação desta distribuição
 
 Builds frontend, demo e imagem Docker são verificados localmente e pelo CI. O funcionamento no host Linux do Docker foi testado; os provedores listados não foram provisionados automaticamente nem homologados individualmente.
+
+Atualizações pelo painel, scanner de CVEs e instalação em um único comando estão em [MAINTENANCE.md](MAINTENANCE.md). Para a instalação com agente, acrescente `-f compose.maintenance.yaml` às operações Compose manuais e preserve o nome do projeto registrado.

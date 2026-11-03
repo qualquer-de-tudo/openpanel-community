@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use QOpenPanel\Community\Models\Resource;
 use QOpenPanel\Community\Models\User;
+use QOpenPanel\Community\Services\MaintenanceBridge;
 use QOpenPanel\Community\Services\PanelAutomation;
 use QOpenPanel\Community\Services\TemplateCatalog;
 use QOpenPanel\Community\Services\TemplateInstaller;
@@ -39,6 +40,7 @@ class PanelController extends Controller
                 abort(403);
             }
             $u = User::create([...$data, 'password' => Hash::make($data['password'])]);
+            $u->forceFill(['is_operator' => true])->save();
             DB::table('qopenpanel_accounts')->insert(['user_id' => $u->id, 'created_at' => now(), 'updated_at' => now()]);
 
             return $u;
@@ -71,14 +73,14 @@ class PanelController extends Controller
 
     public function index(Request $r)
     {
-        return Inertia::render('Panel', ['resources' => Resource::where('user_id', $r->user()->id)->latest()->get(), 'account' => DB::table('qopenpanel_accounts')->where('user_id', $r->user()->id)->first(), 'catalog' => config('qopenpanel.catalog'), 'templates' => app(TemplateCatalog::class)->summaries(), 'templateInstallations' => DB::table('qopenpanel_template_installations')->where('user_id', $r->user()->id)->get()->map(fn ($installation) => [...app(TemplateInstaller::class)->inspect($installation->resource_id), 'resource' => app(PanelAutomation::class)->resource($installation->resource_id)->only(['id', 'name', 'revision'])]), 'user' => $r->user()->only('name', 'email'), 'message' => session('message'), 'messageKey' => session('message_key'), 'server' => ['hostname' => gethostname(), 'platform' => PHP_OS_FAMILY, 'php' => PHP_VERSION, 'agent' => false]]);
+        return Inertia::render('Panel', ['resources' => Resource::where('user_id', $r->user()->id)->latest()->get(), 'account' => DB::table('qopenpanel_accounts')->where('user_id', $r->user()->id)->first(), 'catalog' => config('qopenpanel.catalog'), 'templates' => app(TemplateCatalog::class)->summaries(), 'templateInstallations' => DB::table('qopenpanel_template_installations')->where('user_id', $r->user()->id)->get()->map(fn ($installation) => [...app(TemplateInstaller::class)->inspect($installation->resource_id), 'resource' => app(PanelAutomation::class)->resource($installation->resource_id)->only(['id', 'name', 'revision'])]), 'maintenance' => $r->user()->is_operator ? app(MaintenanceBridge::class)->status() : null, 'user' => $r->user()->only('name', 'email', 'is_operator'), 'message' => session('message'), 'messageKey' => session('message_key'), 'server' => ['hostname' => gethostname(), 'platform' => PHP_OS_FAMILY, 'php' => PHP_VERSION, 'agent' => false]]);
     }
 
     public function store(Request $r)
     {
         app(PanelAutomation::class)->save($r->all());
 
-        return back()->with('message', __('ConfiguraÃ§Ã£o salva. ExecuÃ§Ã£o no Linux aguarda a integraÃ§Ã£o do agente.'))->with('message_key', 'ConfiguraÃ§Ã£o salva. ExecuÃ§Ã£o no Linux aguarda a integraÃ§Ã£o do agente.');
+        return back()->with('message', __('Configuração salva. Execução no Linux aguarda a integração do agente.'))->with('message_key', 'Configuração salva. Execução no Linux aguarda a integração do agente.');
     }
 
     public function destroy(Request $r, Resource $resource)
@@ -86,6 +88,6 @@ class PanelController extends Controller
         abort_unless($resource->user_id === $r->user()->id, 404);
         app(PanelAutomation::class)->remove($resource->id, $resource->revision);
 
-        return back()->with('message', __('ConfiguraÃ§Ã£o removida.'))->with('message_key', 'ConfiguraÃ§Ã£o removida.');
+        return back()->with('message', __('Configuração removida.'))->with('message_key', 'Configuração removida.');
     }
 }

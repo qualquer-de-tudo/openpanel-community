@@ -1,0 +1,10 @@
+[Unit]
+Description=Process authorized OpenPanel maintenance jobs
+
+[Timer]
+OnBootSec=15
+OnUnitActiveSec=15
+Unit=openpanel-maintenance.service
+
+[Install]
+WantedBy=timers.target

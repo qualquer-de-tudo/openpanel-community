@@ -27,12 +27,21 @@ jobs:
       - run: npm run build:package
       - run: npm run build:demo
       - run: composer test
+      - name: Test restricted Linux maintenance broker
+        run: docker run --rm -v "$PWD:/work:ro" -w /work python:3.13-slim python -m unittest discover -s tests/Agent -v
       - run: composer templates:check
       - name: Check published template versions
         env:
           TEMPLATE_BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
         run: node bin/templates-policy.mjs
       - run: node --test tests/Unit/*.test.mjs
+      - name: Exercise the pinned CVE scanner on a public Ubuntu fixture
+        run: |
+          docker volume create openpanel-cve-fixture
+          docker run --rm -v openpanel-cve-fixture:/out ubuntu:24.04 sh -c 'mkdir -p /out/etc /out/usr/lib /out/var/lib/dpkg; cp /etc/os-release /out/etc/os-release; cp /usr/lib/os-release /out/usr/lib/os-release; cp /etc/lsb-release /out/etc/lsb-release; cp /var/lib/dpkg/status /out/var/lib/dpkg/status'
+          SCANNER=$(python3 -c 'import runpy; print(runpy.run_path("bin/host-agent.py")["SCANNER"])')
+          docker run --rm --cap-drop=ALL --security-opt=no-new-privileges --read-only --memory=1g --cpus=1 --pids-limit=128 --tmpfs /tmp:rw,noexec,nosuid,size=512m -v openpanel-cve-fixture:/host:ro -v openpanel-trivy-test-cache:/cache "$SCANNER" rootfs --cache-dir /cache --scanners vuln --pkg-types os --offline-scan --list-all-pkgs=false --format json /host > /tmp/openpanel-scan.json
+          python3 -c 'import json; value=json.load(open("/tmp/openpanel-scan.json")); assert value["Metadata"]["OS"]["Family"] == "ubuntu"; assert any(row.get("Class") == "os-pkgs" for row in value.get("Results", []))'
       - run: docker compose config --quiet
       - run: PANEL_DOMAIN=panel.example.com docker compose -f compose.yaml -f compose.production.yaml config --quiet
       - run: for script in install.sh docker/install.sh docker/entrypoint.sh; do bash -n "$script"; done

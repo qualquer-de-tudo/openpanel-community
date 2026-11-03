@@ -8,3 +8,9 @@
         Referrer-Policy strict-origin-when-cross-origin
     }
 }
+
+:9090 {
+    root * /app/public
+    php_fastcgi panel:9000
+    file_server
+}

@@ -8,7 +8,7 @@ Compatibilidade inicial: Laravel 13 (framework >=13.17) e Inertia Laravel 3.7+. 
 
 ```bash
 composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/openpanel-community.git
-composer require "qualquer-de-tudo/openpanel-community:^0.6@beta"
+composer require "qualquer-de-tudo/openpanel-community:^0.7@beta"
 php artisan qopenpanel:install --force
 ```
 
@@ -108,3 +108,7 @@ O instalador sobe os serviços do painel. Não instala os serviços gerenciados 
 No checkout de desenvolvimento, execute `npm run build:package` ao alterar o frontend e versione `resources/dist`. A demo continua usando `npm run build:demo`. O CI testa o módulo instalado em Laravel limpo, incluindo instalação, descoberta automática e caches de configuração/rotas.
 
 Para atualizar o nome Composer da versão 0.5 e preservar o checkout/volumes após a renomeação do repositório, siga [BOOTSTRAP.md](BOOTSTRAP.md#atualizar-instalações-anteriores). Os testes do pacote agora usam `composer test`; comandos Artisan de desenvolvimento usam `php vendor/bin/testbench`, sem uma aplicação Laravel na raiz.
+
+## Manutenção do host na 0.7
+
+Novas primeiras contas são operadoras; contas anteriores exigem designação local com `qopenpanel:operator`. A instalação independente em Linux/systemd/Docker rootful configura o broker de atualizações e CVEs. O Composer, sozinho, não concede acesso ao host de uma aplicação Laravel existente. Veja [MAINTENANCE.md](MAINTENANCE.md).

@@ -40,3 +40,7 @@ Pacote auto descoberto em `vendor`, tabelas/guard/configuração isolados, asset
 ## 0.6.0-beta.1 — pacote sem aplicação na raiz
 
 Repositório e pacote renomeados para openpanel-community. Boilerplate Laravel removido; testes isolados em Orchestra Testbench. Bootstrap automático via apt para Git/curl/CA e Docker Engine/Compose/Buildx em Ubuntu/Debian suportados. O Dockerfile cria Laravel na imagem e instala o módulo em vendor. O executor Linux dos serviços gerenciados continua pendente. [Instalação e migração do nome](BOOTSTRAP.md).
+
+## 0.7.0-beta.1 — manutenção restrita
+
+Instalador aceita stdin/pipe e busca o produto automaticamente. Operadores podem consultar releases oficiais, solicitar upgrades e verificações de pacotes Ubuntu/Debian via broker local em Linux/systemd/Docker rootful. Há backup, candidato com portas não publicadas, checagem de saúde e recuperação limitada por fase. CVEs não são corrigidas automaticamente; o scanner não equivale a uma auditoria completa do host. O executor geral dos serviços gerenciados continua pendente. [Detalhes](MAINTENANCE.md).

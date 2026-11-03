@@ -41,6 +41,7 @@ import "../css/app.css";
 import { I18nProvider, LanguageSelector, useI18n } from "./i18n.jsx";
 import release from "../data/release.json";
 import Templates from "./Templates.jsx";
+import Maintenance from "./Maintenance.jsx";
 const nav = [
     ["overview", "Visão geral", LayoutDashboard],
     ["sites", "Sites e projetos", Globe],
@@ -56,8 +57,10 @@ const nav = [
     ["marketplace", "Marketplace", Download],
     ["templates", "Templates", Layers],
     ["accounts", "Contas e limites", Settings],
+    ["maintenance", "Manutenção do servidor", ShieldCheck],
 ];
 const descriptions = {
+    maintenance: "Versões oficiais e verificações de segurança do servidor.",
     sites: "Seus projetos, do repositório ao servidor.",
     services: "Escolha a stack ideal para cada aplicação.",
     databases: "Dados organizados, ambientes independentes.",
@@ -219,6 +222,7 @@ export function Panel({
     demo = false,
     templates = [],
     templateInstallations = [],
+    maintenance = null,
 }) {
     const { t, number } = useI18n();
     const [page, setPage] = useState("overview"),
@@ -290,7 +294,7 @@ export function Panel({
                 </div>
                 <span className="nav-caption">{t("WORKSPACE")}</span>
                 <nav>
-                    {nav.map(([id, label, I], i) => (
+                    {nav.filter(([id]) => id !== "maintenance" || demo || user.is_operator).map(([id, label, I], i) => (
                         <React.Fragment key={id}>
                             {i === 5 && (
                                 <span className="nav-caption spaced">
@@ -433,7 +437,7 @@ export function Panel({
                         </div>
                         <button
                             style={
-                                page === "templates"
+                                (page === "templates" || page === "maintenance")
                                     ? { display: "none" }
                                     : undefined
                             }
@@ -800,6 +804,8 @@ export function Panel({
                             installations={templateInstallations}
                             demo={demo}
                         />
+                    ) : page === "maintenance" ? (
+                        <Maintenance data={maintenance} demo={demo} />
                     ) : page === "accounts" ? (
                         <section className="card account-card">
                             <h3>{t("Meu plano de hospedagem")}</h3>
