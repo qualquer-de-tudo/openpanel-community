@@ -51,6 +51,51 @@ const resources = [
         status: "planned",
     },
 ];
+const demoRelease = __QOPENPANEL_TEMPLATES__.find(
+    (item) => item.id === "static-site" && item.version === "1.1.0",
+);
+const oldDemoRelease = __QOPENPANEL_TEMPLATES__.find(
+    (item) => item.id === "static-site" && item.version === "1.0.0",
+);
+resources.push({
+    id: 6,
+    kind: "sites",
+    name: "landing-template",
+    engine: "Static",
+    domain: "landing.example.com",
+    disk_mb: 256,
+    status: "planned",
+});
+const templateInstallations = [
+    {
+        installation: {
+            id: "demo-installation",
+            resource_id: 6,
+            template_id: "static-site",
+            version: "1.1.0",
+            digest: demoRelease.digest,
+        },
+        resource: { id: 6, name: "landing-template", revision: 2 },
+        history: [
+            {
+                id: "demo-update",
+                sequence: 2,
+                action: "update",
+                version: "1.1.0",
+                digest: demoRelease.digest,
+                project_version_id: "22222222-2222-4222-8222-222222222222",
+            },
+            {
+                id: "demo-initial",
+                sequence: 1,
+                action: "install",
+                version: "1.0.0",
+                digest: oldDemoRelease.digest,
+                project_version_id: "11111111-1111-4111-8111-111111111111",
+            },
+        ],
+    },
+];
 createInertiaApp({
     page: {
         component: "Panel",
@@ -58,6 +103,8 @@ createInertiaApp({
             demo: true,
             resources,
             catalog,
+            templates: __QOPENPANEL_TEMPLATES__,
+            templateInstallations,
             account: {
                 disk_mb: 20480,
                 memory_mb: 4096,

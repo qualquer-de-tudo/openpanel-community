@@ -11,7 +11,10 @@
     "translations:add": "node bin/translations.mjs add",
     "translations:sync": "node bin/translations.mjs sync",
     "translations:status": "node bin/translations.mjs status",
-    "test:i18n": "node --test tests/Unit/i18n.test.mjs"
+    "test:i18n": "node --test tests/Unit/i18n.test.mjs",
+    "templates:new": "node bin/template-new.mjs",
+    "templates:lock": "php artisan panel:templates-lock",
+    "templates:check": "php artisan panel:templates-check"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

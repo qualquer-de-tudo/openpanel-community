@@ -28,3 +28,7 @@ Endpoint autenticado, permissões por conta/recurso, cofre criptografado sem ret
 ## Beta 0.3.0-beta.1
 
 Botão de instalação na demo, seis idiomas iniciais e catálogos compartilhados React/Laravel. Traduções verificadas no CI. A classificação beta se refere à experiência do painel; o executor Linux e os deploys efetivos continuam pendentes.
+
+## Beta 0.4.0-beta.1
+
+Templates de projeto versionados, catálogo comunitário via pull requests, exportação ZIP com lockfile, atualização e rollback com snapshots. Nenhum script de template é executado durante a instalação. O executor Linux permanece pendente.

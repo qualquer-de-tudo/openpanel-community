@@ -79,49 +79,59 @@ if (action === "add") {
         errors += missing + extra.length;
     }
     if (action === "check") {
-        const source = fs.readFileSync("resources/js/app.jsx", "utf8");
-        const { ast } = await prettier.__debug.parse(source, {
-            parser: "babel",
-        });
-        const brands = new Set([
-            "open",
-            "panel",
-            "community",
-            "O",
-            "· PHP",
-            "OpenPanel Community",
-            "Laravel + React + Inertia",
-            "MB",
-        ]);
-        function inspect(node, parent) {
-            if (!node || typeof node !== "object") return;
-            if (node.type === "JSXText") {
-                const value = node.value.trim().replace(/\s+/g, " ");
-                if (/\p{L}/u.test(value) && !brands.has(value)) {
-                    console.error(`Unlocalized JSX text: ${value}`);
+        for (const file of [
+            "resources/js/app.jsx",
+            "resources/js/Templates.jsx",
+        ]) {
+            const source = fs.readFileSync(file, "utf8");
+            const { ast } = await prettier.__debug.parse(source, {
+                parser: "babel",
+            });
+            const brands = new Set([
+                "open",
+                "panel",
+                "community",
+                "O",
+                "· PHP",
+                "OpenPanel Community",
+                "Laravel + React + Inertia",
+                "MB",
+                "v",
+                "· v",
+                "SHA-256:",
+            ]);
+            function inspect(node, parent) {
+                if (!node || typeof node !== "object") return;
+                if (node.type === "JSXText") {
+                    const value = node.value.trim().replace(/\s+/g, " ");
+                    if (/\p{L}/u.test(value) && !brands.has(value)) {
+                        console.error(`Unlocalized JSX text: ${value}`);
+                        errors++;
+                    }
+                }
+                if (
+                    node.type === "CallExpression" &&
+                    node.callee?.type === "Identifier" &&
+                    node.callee.name === "t" &&
+                    node.arguments[0]?.type === "StringLiteral" &&
+                    !Object.hasOwn(base, node.arguments[0].value)
+                ) {
+                    console.error(
+                        `Missing source key: ${node.arguments[0].value}`,
+                    );
                     errors++;
                 }
+                for (const [key, value] of Object.entries(node)) {
+                    if (["loc", "tokens", "comments", "extra"].includes(key))
+                        continue;
+                    if (Array.isArray(value))
+                        value.forEach((child) => inspect(child, node));
+                    else if (value && typeof value === "object")
+                        inspect(value, node);
+                }
             }
-            if (
-                node.type === "CallExpression" &&
-                node.callee?.type === "Identifier" &&
-                node.callee.name === "t" &&
-                node.arguments[0]?.type === "StringLiteral" &&
-                !Object.hasOwn(base, node.arguments[0].value)
-            ) {
-                console.error(`Missing source key: ${node.arguments[0].value}`);
-                errors++;
-            }
-            for (const [key, value] of Object.entries(node)) {
-                if (["loc", "tokens", "comments", "extra"].includes(key))
-                    continue;
-                if (Array.isArray(value))
-                    value.forEach((child) => inspect(child, node));
-                else if (value && typeof value === "object")
-                    inspect(value, node);
-            }
+            inspect(ast, null);
         }
-        inspect(ast, null);
         if (errors) {
             console.error(`Translation check failed: ${errors} issue(s).`);
             process.exitCode = 1;

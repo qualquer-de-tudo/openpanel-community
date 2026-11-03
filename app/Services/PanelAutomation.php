@@ -124,6 +124,8 @@ class PanelAutomation
 
     public function manifest(Resource $resource): array
     {
-        return ['configuration' => $resource->only(['kind', 'name', 'engine', 'domain', 'repository', 'disk_mb']), 'secret_bindings' => DB::table('secret_bindings')->join('vault_secrets', 'secret_bindings.secret_id', '=', 'vault_secrets.id')->where('secret_bindings.user_id', Auth::id())->where('secret_bindings.resource_id', $resource->id)->orderBy('variable')->get(['variable', 'secret_id', 'vault_secrets.version as secret_version'])->map(fn ($b) => (array) $b)->all()];
+        $template = DB::table('template_installations')->where('resource_id', $resource->id)->where('user_id', Auth::id())->first(['template_id', 'version', 'digest']);
+
+        return ['template' => $template ? (array) $template : null, 'configuration' => $resource->only(['kind', 'name', 'engine', 'domain', 'repository', 'disk_mb']), 'secret_bindings' => DB::table('secret_bindings')->join('vault_secrets', 'secret_bindings.secret_id', '=', 'vault_secrets.id')->where('secret_bindings.user_id', Auth::id())->where('secret_bindings.resource_id', $resource->id)->orderBy('variable')->get(['variable', 'secret_id', 'vault_secrets.version as secret_version'])->map(fn ($b) => (array) $b)->all()];
     }
 }

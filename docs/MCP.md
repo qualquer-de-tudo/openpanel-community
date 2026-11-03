@@ -124,3 +124,7 @@ node --test tests/Unit/mcp-bridge.test.mjs
 Os testes HTTP verificam protocolo MCP, isolamento, escopos, expiração/revogação, cofre sem valores nas respostas, versões, conflitos e GitHub simulado. A ponte é testada com servidor local de teste. Esses testes não equivalem a uma auditoria de segurança independente.
 
 Referências técnicas: [Laravel MCP](https://laravel.com/framework/docs/mcp), [práticas de segurança MCP](https://modelcontextprotocol.io/docs/2025-11-25/tutorials/security/security_best_practices) e [API Git Data do GitHub](https://docs.github.com/en/rest/git).
+
+## Templates de projeto
+
+A ferramenta project_templates fornece catálogo, inspeção, instalação, atualização e rollback de templates fixados por versão. Gravação exige panel:write e versions:write. Consulte [templates da comunidade](TEMPLATES.md).

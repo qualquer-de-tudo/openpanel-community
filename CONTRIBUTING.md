@@ -11,3 +11,5 @@ Obrigado por ajudar o qopenpanel-community. Abra uma issue descrevendo o problem
 Não inclua tokens, chaves privadas, `.env`, dumps de clientes ou dados pessoais. Receitas que executem ações no host precisam de testes em Linux, validação de entradas e uma descrição do modelo de permissões. Não marque funcionalidades planejadas como operacionais.
 
 Suas contribuições são distribuídas sob a licença MIT do projeto.
+
+Para contribuir com templates, siga [o guia de templates](docs/TEMPLATES.md). Releases existentes são imutáveis; adicione uma nova versão e atualize o lockfile.

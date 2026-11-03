@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.5"
-          extensions: pdo_sqlite, mbstring, intl
+          extensions: pdo_sqlite, mbstring, intl, zip
           coverage: none
       - uses: actions/setup-node@v4
         with:
@@ -27,6 +29,12 @@ jobs:
       - run: npm run build
       - run: npm run build:demo
       - run: php artisan test
+      - run: php artisan panel:templates-check
+      - name: Check published template versions
+        env:
+          TEMPLATE_BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+        run: node bin/templates-policy.mjs
+      - run: node --test tests/Unit/templates-policy.test.mjs
       - run: node --test tests/Unit/mcp-bridge.test.mjs
       - run: docker compose config --quiet
       - run: PANEL_DOMAIN=panel.example.com docker compose -f compose.yaml -f compose.production.yaml config --quiet

@@ -5,6 +5,7 @@ namespace App\Mcp\Servers;
 use App\Mcp\Tools\GitRepository;
 use App\Mcp\Tools\InspectPanel;
 use App\Mcp\Tools\ManagePanelResource;
+use App\Mcp\Tools\ManageTemplates;
 use App\Mcp\Tools\ManageVault;
 use App\Mcp\Tools\ProjectVersions;
 use Laravel\Mcp\Server;
@@ -32,6 +33,7 @@ class PanelServer extends Server
         ManagePanelResource::class,
         ManageVault::class,
         ProjectVersions::class,
+        ManageTemplates::class,
         GitRepository::class,
     ];
 

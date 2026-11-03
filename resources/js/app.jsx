@@ -39,6 +39,7 @@ import {
 import "../css/app.css";
 import { I18nProvider, LanguageSelector, useI18n } from "./i18n.jsx";
 import release from "../data/release.json";
+import Templates from "./Templates.jsx";
 const nav = [
     ["overview", "Visão geral", LayoutDashboard],
     ["sites", "Sites e projetos", Globe],
@@ -52,6 +53,7 @@ const nav = [
     ["crons", "Tarefas agendadas", Clock3],
     ["integrations", "Integrações", Plug],
     ["marketplace", "Marketplace", Download],
+    ["templates", "Templates", Layers],
     ["accounts", "Contas e limites", Settings],
 ];
 const descriptions = {
@@ -214,6 +216,8 @@ export function Panel({
     message,
     messageKey,
     demo = false,
+    templates = [],
+    templateInstallations = [],
 }) {
     const { t, number } = useI18n();
     const [page, setPage] = useState("overview"),
@@ -416,13 +420,22 @@ export function Panel({
                                                   : user.name.split(" ")[0],
                                           },
                                       )
-                                    : t(descriptions[page]) ||
-                                      t(
-                                          "Recursos organizados para cada conta.",
-                                      )}
+                                    : page === "templates"
+                                      ? t(
+                                            "Projetos prontos para começar, com versões sob seu controle.",
+                                        )
+                                      : t(descriptions[page]) ||
+                                        t(
+                                            "Recursos organizados para cada conta.",
+                                        )}
                             </p>
                         </div>
                         <button
+                            style={
+                                page === "templates"
+                                    ? { display: "none" }
+                                    : undefined
+                            }
                             className="primary"
                             onClick={() =>
                                 open(
@@ -780,6 +793,12 @@ export function Panel({
                                 </div>
                             </section>
                         </>
+                    ) : page === "templates" ? (
+                        <Templates
+                            templates={templates}
+                            installations={templateInstallations}
+                            demo={demo}
+                        />
                     ) : page === "accounts" ? (
                         <section className="card account-card">
                             <h3>{t("Meu plano de hospedagem")}</h3>

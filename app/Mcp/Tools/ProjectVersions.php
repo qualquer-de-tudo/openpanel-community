@@ -3,6 +3,7 @@
 namespace App\Mcp\Tools;
 
 use App\Services\PanelAutomation;
+use App\Services\ProjectVersionStore;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,17 +30,8 @@ class ProjectVersions extends PanelTool
             }
             if ($data['action'] === 'snapshot') {
                 abort_unless($data['expected_revision'] === $resource->revision, 409);
-                $manifest = $this->panel()->manifest($resource);
-                $json = json_encode($manifest, JSON_THROW_ON_ERROR);
-                $id = (string) Str::uuid();
-                $previous = DB::table('project_versions')->where('resource_id', $resource->id)->orderByDesc('revision')->first();
-                if ($previous && $previous->digest === hash('sha256', $json) && $previous->source_sha === ($data['source_sha'] ?? null)) {
-                    return ['version_id' => $previous->id, 'revision' => $previous->revision, 'resource_revision' => $resource->revision, 'digest' => $previous->digest];
-                }
-                $number = ($previous?->revision ?? 0) + 1;
-                DB::table('project_versions')->insert(['id' => $id, 'user_id' => Auth::id(), 'resource_id' => $resource->id, 'revision' => $number, 'manifest' => $json, 'digest' => hash('sha256', $json), 'source_sha' => $data['source_sha'] ?? null, 'created_at' => now()]);
 
-                return ['version_id' => $id, 'revision' => $number, 'resource_revision' => $resource->revision, 'digest' => hash('sha256', $json)];
+                return app(ProjectVersionStore::class)->capture($resource, $data['source_sha'] ?? null);
             }
             $version = DB::table('project_versions')->where('id', $data['version_id'])->where('resource_id', $resource->id)->where('user_id', Auth::id())->first();
             abort_unless($version, 404);
@@ -57,7 +49,9 @@ class ProjectVersions extends PanelTool
             }
             $this->panel()->authorize('panel:write');
             abort_unless($data['expected_revision'] === $resource->revision, 409);
-            $currentBindings = $this->panel()->manifest($resource)['secret_bindings'];
+            $currentManifest = $this->panel()->manifest($resource);
+            abort_unless(($manifest['template'] ?? null) === ($currentManifest['template'] ?? null), 409);
+            $currentBindings = $currentManifest['secret_bindings'];
             abort_unless($manifest['secret_bindings'] === $currentBindings, 409);
             $restored = $this->panel()->save($manifest['configuration'], $resource->id, $data['expected_revision']);
 

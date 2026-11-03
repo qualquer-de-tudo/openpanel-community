@@ -92,7 +92,7 @@ class PanelMcpTest extends TestCase
     {
         [$token] = $this->grant($this->account());
         $this->rpc($token, 'initialize', ['protocolVersion' => '2025-11-25', 'capabilities' => (object) [], 'clientInfo' => ['name' => 'test', 'version' => '1']])->assertOk()->assertJsonPath('result.serverInfo.name', 'QOpenPanel Community');
-        $this->rpc($token, 'tools/list')->assertOk()->assertJsonCount(5, 'result.tools');
+        $this->rpc($token, 'tools/list')->assertOk()->assertJsonCount(6, 'result.tools');
     }
 
     public function test_inspection_is_restricted_to_account_and_granted_projects(): void

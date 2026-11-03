@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Resource;
 use App\Models\User;
 use App\Services\PanelAutomation;
+use App\Services\TemplateCatalog;
+use App\Services\TemplateInstaller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -59,7 +61,7 @@ class PanelController extends Controller
 
     public function index(Request $r)
     {
-        return Inertia::render('Panel', ['resources' => Resource::where('user_id', $r->user()->id)->latest()->get(), 'account' => DB::table('accounts')->where('user_id', $r->user()->id)->first(), 'catalog' => config('catalog'), 'user' => $r->user()->only('name', 'email'), 'message' => session('message'), 'messageKey' => session('message_key'), 'server' => ['hostname' => gethostname(), 'platform' => PHP_OS_FAMILY, 'php' => PHP_VERSION, 'agent' => false]]);
+        return Inertia::render('Panel', ['resources' => Resource::where('user_id', $r->user()->id)->latest()->get(), 'account' => DB::table('accounts')->where('user_id', $r->user()->id)->first(), 'catalog' => config('catalog'), 'templates' => app(TemplateCatalog::class)->summaries(), 'templateInstallations' => DB::table('template_installations')->where('user_id', $r->user()->id)->get()->map(fn ($installation) => [...app(TemplateInstaller::class)->inspect($installation->resource_id), 'resource' => app(PanelAutomation::class)->resource($installation->resource_id)->only(['id', 'name', 'revision'])]), 'user' => $r->user()->only('name', 'email'), 'message' => session('message'), 'messageKey' => session('message_key'), 'server' => ['hostname' => gethostname(), 'platform' => PHP_OS_FAMILY, 'php' => PHP_VERSION, 'agent' => false]]);
     }
 
     public function store(Request $r)

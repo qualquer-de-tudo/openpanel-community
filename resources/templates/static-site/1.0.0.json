@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "id": "static-site",
+  "version": "1.0.0",
+  "name": {
+    "pt_BR": "Site estático",
+    "en": "Static website",
+    "fr": "Site statique",
+    "es": "Sitio estático",
+    "zh_CN": "静态网站",
+    "ja": "静的サイト"
+  },
+  "description": {
+    "pt_BR": "Um site leve com HTML e CSS, pronto para personalizar.",
+    "en": "A lightweight HTML and CSS website, ready to customize.",
+    "fr": "Un site léger en HTML et CSS, prêt à personnaliser.",
+    "es": "Un sitio ligero con HTML y CSS, listo para personalizar.",
+    "zh_CN": "轻量级 HTML 和 CSS 网站，可立即自定义。",
+    "ja": "HTML と CSS の軽量サイト。すぐにカスタマイズできます。"
+  },
+  "author": "QOpenPanel Community",
+  "license": "MIT",
+  "panel_min": "0.4.0-beta.1",
+  "engine": "Static",
+  "disk_mb": 256,
+  "files": {
+    "index.html": "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>My project</title><link rel=\"stylesheet\" href=\"style.css\"></head><body><main><p>YOUR NEXT IDEA STARTS HERE</p><h1>Build something worth sharing.</h1><p>Your website is ready to customize.</p></main></body></html>\n",
+    "style.css": "body{font-family:system-ui;margin:0;background:#edf4ef;color:#204d3b}main{max-width:760px;margin:15vh auto;padding:32px}h1{font-size:clamp(36px,6vw,72px);line-height:1.1}p{line-height:1.7}\n",
+    "README.md": "# QOpenPanel starter\n\nGenerated from a versioned community template. Open index.html in a browser.\nReview the code before publishing. No services have been installed.\nThe qopenpanel-template.lock.json file records the exact template version and digest.\n"
+  }
+}

@@ -4,7 +4,7 @@
 
 [Demo interativa](https://qualquer-de-tudo.github.io/qopenpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
-> **Versão 0.3.0-beta.1 — beta de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+> **Versão 0.4.0-beta.1 — beta de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
 ![Dashboard de demonstração do OpenPanel](docs/demo-preview.png)
 
@@ -46,6 +46,10 @@ Crie sua conta pelo túnel antes de publicar o domínio. Não há senha padrão.
 ## MCP para IAs
 
 O endpoint MCP permite descoberta, gestão de configurações, cofre de credenciais por referências opacas, snapshots e restauração de configurações, planos de deploy e um broker de versionamento GitHub. Concessões têm escopos, validade e revogação; o modelo não recebe os valores do cofre. Consulte [conexão, comandos e limites de segurança](docs/MCP.md). A demo estática não oferece acesso MCP.
+
+## Templates da comunidade
+
+Instale projetos iniciais por versão exata, exporte arquivos com lockfile, atualize e restaure versões preservando o histórico. O catálogo inclui site estático e React/Vite. [Criar e contribuir com templates](docs/TEMPLATES.md).
 
 ## Provedores
 
