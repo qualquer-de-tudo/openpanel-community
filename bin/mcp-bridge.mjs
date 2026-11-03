@@ -34,7 +34,7 @@ try {
 } catch {
     process.stderr.write(
         t(
-            "QOpenPanel: configuração privada inválida ou permissões insuficientes.",
+            "OpenPanel: configuração privada inválida ou permissões insuficientes.",
         ) + "\n",
     );
     process.exit(1);
@@ -87,14 +87,14 @@ for await (const line of input) {
                     error: {
                         code: -32603,
                         message: t(
-                            "QOpenPanel: operação recusada, acesso expirado ou servidor indisponível.",
+                            "OpenPanel: operação recusada, acesso expirado ou servidor indisponível.",
                         ),
                     },
                 }) + "\n",
             );
         else
             process.stderr.write(
-                t("QOpenPanel: mensagem inválida ou operação recusada.") + "\n",
+                t("OpenPanel: mensagem inválida ou operação recusada.") + "\n",
             );
     }
 }

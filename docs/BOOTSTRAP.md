@@ -7,7 +7,7 @@ O repositório contém o pacote, não uma aplicação Laravel. `install.sh` veri
 Baixe `install.sh` da release e execute com Bash. Se curl já estiver disponível:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.7.0-beta.1/install.sh
+curl --proto '=https' --tlsv1.2 -fsSLo install.sh https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/v0.7.0-beta.2/install.sh
 sudo bash install.sh --private
 ```
 
@@ -33,7 +33,7 @@ O modo privado publica somente em loopback. No computador do administrador:
 ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR
 ```
 
-Abra `http://127.0.0.1:8080/qopenpanel/login` e crie a primeira conta. Nome e e-mail podem ser preparados com `--name` e `--email`. Não existe senha padrão. Para criar a conta pelo terminal e depois liberar IP:
+Abra `http://127.0.0.1:8080/openpanel/login` e crie a primeira conta. Nome e e-mail podem ser preparados com `--name` e `--email`. Não existe senha padrão. Para criar a conta pelo terminal e depois liberar IP:
 
 ```bash
 sudo bash install.sh --ip 203.0.113.10 --email admin@example.com --name "Administrador"

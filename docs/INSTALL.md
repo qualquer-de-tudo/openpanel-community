@@ -31,7 +31,7 @@ O painel fica limitado a `127.0.0.1:8080` no servidor. No computador do administ
 ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR
 ```
 
-Abra `http://127.0.0.1:8080/qopenpanel/login` no computador e crie a primeira conta. A instalação vazia permite o cadastro inicial a quem acessá-la; conclua este passo antes de abrir o serviço à Internet. Também é possível operar permanentemente por túnel, sem domínio.
+Abra `http://127.0.0.1:8080/openpanel/login` no computador e crie a primeira conta. A instalação vazia permite o cadastro inicial a quem acessá-la; conclua este passo antes de abrir o serviço à Internet. Também é possível operar permanentemente por túnel, sem domínio.
 
 Para acesso direto ao IP em rede privada confiável, execute `PANEL_BIND=0.0.0.0 PANEL_URL=http://IP_DO_SERVIDOR:8080 docker compose up -d` e restrinja a porta 8080 na rede. Esse modo é HTTP e não deve transmitir credenciais pela Internet pública.
 
@@ -56,7 +56,7 @@ docker compose --env-file deploy.env -f compose.yaml -f compose.production.yaml 
 
 O Caddy solicita e renova HTTPS automaticamente quando DNS e conectividade estão corretos. A chave do Laravel e o banco permanecem em `panel-data`; certificados ficam em `caddy-data`. Veja a [documentação de HTTPS do Caddy](https://caddyserver.com/docs/automatic-https).
 
-Acesse `https://painel.seudominio.com/qopenpanel`. No primeiro teste, use DNS direto, sem proxy de CDN. Se usar Cloudflare depois, mantenha TLS até a origem; esta receita não implementa DNS-01 pela API Cloudflare.
+Acesse `https://painel.seudominio.com/openpanel`. No primeiro teste, use DNS direto, sem proxy de CDN. Se usar Cloudflare depois, mantenha TLS até a origem; esta receita não implementa DNS-01 pela API Cloudflare.
 
 Portas publicadas pelo Docker podem contornar regras simples do UFW; use também o firewall do provedor e revise o [modelo de rede do Docker](https://docs.docker.com/engine/install/ubuntu/#firewall-limitations).
 

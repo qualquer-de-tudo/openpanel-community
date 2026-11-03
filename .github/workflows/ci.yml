@@ -50,15 +50,15 @@ jobs:
         run: |
           docker compose up -d --no-build
           for attempt in $(seq 1 30); do
-            if curl --fail --silent http://127.0.0.1:8080/qopenpanel/login > /tmp/panel-login.html; then break; fi
+            if curl --fail --silent http://127.0.0.1:8080/openpanel/login > /tmp/panel-login.html; then break; fi
             sleep 2
           done
           grep -q '/vendor/qopenpanel/assets/' /tmp/panel-login.html
           docker compose exec -T panel php artisan qopenpanel:install --force
           docker compose exec -T panel php artisan route:cache
           docker compose exec -T panel php artisan config:cache
-          curl --fail --silent http://127.0.0.1:8080/qopenpanel/login > /tmp/panel-cached.html
-          grep -q 'data-qopenpanel-path="/qopenpanel"' /tmp/panel-cached.html
+          curl --fail --silent http://127.0.0.1:8080/openpanel/login > /tmp/panel-cached.html
+          grep -q 'data-qopenpanel-path="/openpanel"' /tmp/panel-cached.html
           docker compose exec -T panel composer show qualquer-de-tudo/openpanel-community --path
   bootstrap:
     runs-on: ubuntu-latest

@@ -14,7 +14,7 @@ php artisan qopenpanel:install --force
 
 O pacote é obtido pelo GitHub, sem depender de cadastro no Packagist. A descoberta de providers é automática. Se o hospedeiro desativar package discovery, registre `QOpenPanel\Community\Providers\QOpenPanelServiceProvider` em `bootstrap/providers.php`.
 
-Abra `/qopenpanel/login` e crie a primeira conta antes de liberar acesso público. Use HTTPS ou túnel SSH. Não existe senha padrão. Também é possível criar a conta pelo terminal:
+Abra `/openpanel/login` e crie a primeira conta antes de liberar acesso público. Use HTTPS ou túnel SSH. Não existe senha padrão. Também é possível criar a conta pelo terminal:
 
 ```bash
 php artisan panel:account admin@example.com --name="Administrador"
@@ -38,7 +38,7 @@ Em seu computador, abra um túnel:
 ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR
 ```
 
-Acesse `http://127.0.0.1:8080/qopenpanel/login`, confira nome/e-mail e escolha a senha. Sem as opções de identidade, preencha tudo no formulário. O modo privado é obrigatório para execução sem terminal e não publica o serviço na Internet.
+Acesse `http://127.0.0.1:8080/openpanel/login`, confira nome/e-mail e escolha a senha. Sem as opções de identidade, preencha tudo no formulário. O modo privado é obrigatório para execução sem terminal e não publica o serviço na Internet.
 
 Para criar a conta pelo terminal e só depois abrir acesso por IP:
 
@@ -46,7 +46,7 @@ Para criar a conta pelo terminal e só depois abrir acesso por IP:
 bash install.sh --ip 203.0.113.10 --email admin@example.com --name "Administrador"
 ```
 
-Substitua o IP de exemplo pelo endereço do servidor. O script prepara Laravel e módulo dentro da imagem, sobe PHP-FPM/Caddy e SQLite persistente, solicita a senha sem eco e só então publica `http://SEU_IP:8080/qopenpanel`. IP usa HTTP: restrinja acesso à rede/IP administrativo ou use túnel até configurar HTTPS. Não exponha FastCGI 9000.
+Substitua o IP de exemplo pelo endereço do servidor. O script prepara Laravel e módulo dentro da imagem, sobe PHP-FPM/Caddy e SQLite persistente, solicita a senha sem eco e só então publica `http://SEU_IP:8080/openpanel`. IP usa HTTP: restrinja acesso à rede/IP administrativo ou use túnel até configurar HTTPS. Não exponha FastCGI 9000.
 
 ## Domínio inicial ou posterior
 
@@ -56,13 +56,13 @@ Com A/AAAA apontando corretamente e portas 80/443 disponíveis:
 bash install.sh --domain painel.example.com
 ```
 
-Execute no mesmo checkout. Se já houver conta, ela será preservada; caso contrário, o script solicita identidade e senha antes de publicar. A configuração anterior de `deploy.env` é copiada para `backups`. O fluxo reinicia serviços: planeje uma janela de manutenção. O endereço passa a `https://painel.example.com/qopenpanel`. Caddy solicita e renova certificados automaticamente; essa receita não implementa DNS-01 Cloudflare. Teste primeiro com DNS direto, sem proxy CDN.
+Execute no mesmo checkout. Se já houver conta, ela será preservada; caso contrário, o script solicita identidade e senha antes de publicar. A configuração anterior de `deploy.env` é copiada para `backups`. O fluxo reinicia serviços: planeje uma janela de manutenção. O endereço passa a `https://painel.example.com/openpanel`. Caddy solicita e renova certificados automaticamente; essa receita não implementa DNS-01 Cloudflare. Teste primeiro com DNS direto, sem proxy CDN.
 
 Em um Laravel hospedeiro existente, configure domínio/HTTPS na infraestrutura desse aplicativo; o módulo não modifica seu servidor web.
 
 ## Isolamento e configuração
 
-- Rotas e nomes: `/qopenpanel` e `qopenpanel.`; MCP: `/qopenpanel/mcp/panel`.
+- Rotas e nomes: `/openpanel` e `qopenpanel.`; MCP: `/openpanel/mcp/panel`.
 - Tabelas: `qopenpanel_*`; usuários e workspaces independentes dos usuários do host.
 - Guard/provider: `qopenpanel`; login no hospedeiro não autoriza o painel. Logout do painel preserva os dados da sessão do host.
 - Configuração: `qopenpanel.*`; não substitui `auth.defaults`, `catalog` ou o layout/Vite do host.
@@ -112,3 +112,7 @@ Para atualizar o nome Composer da versão 0.5 e preservar o checkout/volumes ap�
 ## Manutenção do host na 0.7
 
 Novas primeiras contas são operadoras; contas anteriores exigem designação local com `qopenpanel:operator`. A instalação independente em Linux/systemd/Docker rootful configura o broker de atualizações e CVEs. O Composer, sozinho, não concede acesso ao host de uma aplicação Laravel existente. Veja [MAINTENANCE.md](MAINTENANCE.md).
+
+### Caminho público a partir da 0.7.0-beta.2
+
+O caminho padrão é agora /openpanel (login em /openpanel/login e MCP em /openpanel/mcp/panel). Atualize favoritos e o endpoint dos clientes MCP ao adotar o novo padrão. Caminhos personalizados continuam disponíveis pela variável QOPENPANEL_PATH ou pela configuração qopenpanel.path publicada no aplicativo Laravel. Para manter o endereço anterior em uma instalação existente, configure QOPENPANEL_PATH=qopenpanel explicitamente no ambiente Compose antes de recriar os containers. Os identificadores internos, tabelas, comandos e referências do cofre não foram renomeados.

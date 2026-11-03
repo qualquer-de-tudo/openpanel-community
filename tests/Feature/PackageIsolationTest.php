@@ -22,9 +22,9 @@ class PackageIsolationTest extends TestCase
         DB::table('users')->insert(['name' => 'Host', 'email' => 'host@example.com', 'password' => bcrypt('host-password-123')]);
         $this->get('/')->assertOk()->assertSee('Host application');
         $this->get('/login')->assertOk()->assertSee('Host login');
-        $this->get('/qopenpanel')->assertRedirect('/qopenpanel/login');
-        $this->get('/qopenpanel/login')->assertInertia(fn (AssertableInertia $p) => $p->where('setup', true));
-        $this->post('/qopenpanel/setup', ['name' => 'Panel', 'email' => 'panel@example.com', 'password' => 'panel-password-123', 'password_confirmation' => 'panel-password-123'])->assertRedirect('/qopenpanel');
+        $this->get('/openpanel')->assertRedirect('/openpanel/login');
+        $this->get('/openpanel/login')->assertInertia(fn (AssertableInertia $p) => $p->where('setup', true));
+        $this->post('/openpanel/setup', ['name' => 'Panel', 'email' => 'panel@example.com', 'password' => 'panel-password-123', 'password_confirmation' => 'panel-password-123'])->assertRedirect('/openpanel');
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseHas('qopenpanel_users', ['email' => 'panel@example.com']);
     }
@@ -33,7 +33,7 @@ class PackageIsolationTest extends TestCase
     {
         $host = new HostUser;
         $host->forceFill(['id' => 1, 'name' => 'Host', 'email' => 'host@example.com']);
-        $this->actingAs($host, 'web')->get('/qopenpanel')->assertRedirect('/qopenpanel/login');
+        $this->actingAs($host, 'web')->get('/openpanel')->assertRedirect('/openpanel/login');
         $this->assertAuthenticatedAs($host, 'web');
     }
 
@@ -42,7 +42,7 @@ class PackageIsolationTest extends TestCase
         $host = new HostUser;
         $host->forceFill(['id' => 99, 'name' => 'Host', 'email' => 'host@example.com']);
         $panel = User::factory()->create();
-        $this->actingAs($host, 'web')->actingAs($panel, 'qopenpanel')->withSession(['host_preference' => 'keep'])->post('/qopenpanel/logout')->assertRedirect('/qopenpanel/login')->assertSessionHas('host_preference', 'keep');
+        $this->actingAs($host, 'web')->actingAs($panel, 'qopenpanel')->withSession(['host_preference' => 'keep'])->post('/openpanel/logout')->assertRedirect('/openpanel/login')->assertSessionHas('host_preference', 'keep');
         $this->assertAuthenticatedAs($host, 'web');
         $this->assertGuest('qopenpanel');
     }
@@ -54,7 +54,7 @@ class PackageIsolationTest extends TestCase
         $inertia = app(ResponseFactory::class);
         $locale = app()->getLocale();
         config(['catalog' => ['host' => 'kept']]);
-        $this->withHeader('Accept-Language', 'ja')->get('/qopenpanel/login')->assertOk()->assertInertia(fn (AssertableInertia $p) => $p->where('locale', 'ja'));
+        $this->withHeader('Accept-Language', 'ja')->get('/openpanel/login')->assertOk()->assertInertia(fn (AssertableInertia $p) => $p->where('locale', 'ja'));
         $this->assertSame($translator, app('translator'));
         $this->assertSame($validator, app('validator'));
         $this->assertSame($inertia, app(ResponseFactory::class));
@@ -90,10 +90,10 @@ class PackageIsolationTest extends TestCase
         try {
             $this->artisan('qopenpanel:configure', ['--name' => 'Operator', '--email' => 'invalid'])->assertFailed();
             $this->artisan('qopenpanel:configure', ['--name' => 'Operator', '--email' => 'operator@example.com'])->assertSuccessful();
-            $this->get('/qopenpanel/login')->assertInertia(fn (AssertableInertia $p) => $p->where('defaults.name', 'Operator')->where('defaults.email', 'operator@example.com'));
+            $this->get('/openpanel/login')->assertInertia(fn (AssertableInertia $p) => $p->where('defaults.name', 'Operator')->where('defaults.email', 'operator@example.com'));
             $this->assertDatabaseCount('qopenpanel_users', 0);
             User::factory()->create();
-            $this->get('/qopenpanel/login')->assertInertia(fn (AssertableInertia $p) => $p->where('setup', false)->where('defaults', []));
+            $this->get('/openpanel/login')->assertInertia(fn (AssertableInertia $p) => $p->where('setup', false)->where('defaults', []));
         } finally {
             if (is_file($path)) {
                 unlink($path);

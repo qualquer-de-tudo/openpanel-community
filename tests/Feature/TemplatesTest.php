@@ -79,14 +79,14 @@ class TemplatesTest extends TestCase
 
     public function test_guests_cannot_install_or_download_templates(): void
     {
-        $this->post('/qopenpanel/templates/install', $this->payload())->assertRedirect('/qopenpanel/login');
-        $this->get('/qopenpanel/templates/1/download')->assertRedirect('/qopenpanel/login');
+        $this->post('/openpanel/templates/install', $this->payload())->assertRedirect('/openpanel/login');
+        $this->get('/openpanel/templates/1/download')->assertRedirect('/openpanel/login');
     }
 
     public function test_installation_creates_project_files_provenance_and_snapshot(): void
     {
         $user = $this->account();
-        $this->actingAs($user)->post('/qopenpanel/templates/install', $this->payload())->assertSessionHasNoErrors()->assertRedirect();
+        $this->actingAs($user)->post('/openpanel/templates/install', $this->payload())->assertSessionHasNoErrors()->assertRedirect();
         $resource = Resource::where('user_id', $user->id)->firstOrFail();
         $this->assertSame('Static', $resource->engine);
         $this->assertDatabaseHas('qopenpanel_template_installations', ['resource_id' => $resource->id, 'version' => '1.0.0']);
@@ -103,9 +103,9 @@ class TemplatesTest extends TestCase
         $this->actingAs($user);
         $installed = app(TemplateInstaller::class)->install('static-site', '1.0.0', 'landing');
         $first = DB::table('qopenpanel_template_installation_history')->first();
-        $this->post('/qopenpanel/templates/'.$installed['resource_id'].'/update', ['version' => '1.1.0', 'expected_revision' => 1])->assertSessionHasNoErrors();
+        $this->post('/openpanel/templates/'.$installed['resource_id'].'/update', ['version' => '1.1.0', 'expected_revision' => 1])->assertSessionHasNoErrors();
         $this->assertDatabaseHas('qopenpanel_template_installations', ['resource_id' => $installed['resource_id'], 'version' => '1.1.0']);
-        $this->post('/qopenpanel/templates/'.$installed['resource_id'].'/rollback', ['history_id' => $first->id, 'expected_revision' => 2])->assertSessionHasNoErrors();
+        $this->post('/openpanel/templates/'.$installed['resource_id'].'/rollback', ['history_id' => $first->id, 'expected_revision' => 2])->assertSessionHasNoErrors();
         $this->assertDatabaseHas('qopenpanel_template_installations', ['resource_id' => $installed['resource_id'], 'version' => '1.0.0']);
         $this->assertDatabaseHas('qopenpanel_resources', ['id' => $installed['resource_id'], 'revision' => 3]);
         $this->assertDatabaseCount('qopenpanel_template_installation_history', 3);
@@ -117,7 +117,7 @@ class TemplatesTest extends TestCase
     {
         $this->actingAs($this->account());
         $installed = app(TemplateInstaller::class)->install('static-site', '1.0.0', 'landing');
-        $this->post('/qopenpanel/templates/'.$installed['resource_id'].'/update', ['version' => '1.1.0', 'expected_revision' => 99])->assertSessionHasErrors('template');
+        $this->post('/openpanel/templates/'.$installed['resource_id'].'/update', ['version' => '1.1.0', 'expected_revision' => 99])->assertSessionHasErrors('template');
         $this->assertDatabaseHas('qopenpanel_template_installations', ['resource_id' => $installed['resource_id'], 'version' => '1.0.0']);
         $this->assertDatabaseCount('qopenpanel_template_installation_history', 1);
     }
@@ -126,15 +126,15 @@ class TemplatesTest extends TestCase
     {
         $this->actingAs($this->account());
         $installed = app(TemplateInstaller::class)->install('static-site', '1.0.0', 'private-project');
-        $this->actingAs($this->account())->post('/qopenpanel/templates/'.$installed['resource_id'].'/update', ['version' => '1.1.0', 'expected_revision' => 1])->assertNotFound();
-        $this->get('/qopenpanel/templates/'.$installed['resource_id'].'/download')->assertNotFound();
+        $this->actingAs($this->account())->post('/openpanel/templates/'.$installed['resource_id'].'/update', ['version' => '1.1.0', 'expected_revision' => 1])->assertNotFound();
+        $this->get('/openpanel/templates/'.$installed['resource_id'].'/download')->assertNotFound();
     }
 
     public function test_quota_failure_rolls_back_the_complete_installation(): void
     {
         $user = $this->account();
         DB::table('qopenpanel_accounts')->where('user_id', $user->id)->update(['project_limit' => 0]);
-        $this->actingAs($user)->post('/qopenpanel/templates/install', $this->payload())->assertSessionHasErrors('name');
+        $this->actingAs($user)->post('/openpanel/templates/install', $this->payload())->assertSessionHasErrors('name');
         $this->assertDatabaseCount('qopenpanel_resources', 0);
         $this->assertDatabaseCount('qopenpanel_template_installations', 0);
         $this->assertDatabaseCount('qopenpanel_project_versions', 0);
@@ -146,7 +146,7 @@ class TemplatesTest extends TestCase
         $this->newRelease(['version' => '2.0.0', 'disk_mb' => 3000]);
         $this->actingAs($this->account());
         $installed = app(TemplateInstaller::class)->install('static-site', '1.0.0', 'landing');
-        $this->post('/qopenpanel/templates/'.$installed['resource_id'].'/update', ['version' => '2.0.0', 'expected_revision' => 1])->assertSessionHasErrors('disk_mb');
+        $this->post('/openpanel/templates/'.$installed['resource_id'].'/update', ['version' => '2.0.0', 'expected_revision' => 1])->assertSessionHasErrors('disk_mb');
         $this->assertDatabaseHas('qopenpanel_template_installations', ['resource_id' => $installed['resource_id'], 'version' => '1.0.0']);
         $this->assertDatabaseCount('qopenpanel_template_installation_history', 1);
     }
@@ -155,7 +155,7 @@ class TemplatesTest extends TestCase
     {
         $this->catalog();
         $this->newRelease(['version' => '2.0.0', 'panel_min' => '99.0.0']);
-        $this->actingAs($this->account())->post('/qopenpanel/templates/install', $this->payload('2.0.0'))->assertSessionHasErrors('template');
+        $this->actingAs($this->account())->post('/openpanel/templates/install', $this->payload('2.0.0'))->assertSessionHasErrors('template');
         $this->assertDatabaseCount('qopenpanel_resources', 0);
     }
 
@@ -163,7 +163,7 @@ class TemplatesTest extends TestCase
     {
         $this->actingAs($this->account());
         $installed = app(TemplateInstaller::class)->install('static-site', '1.0.0', 'landing');
-        $response = $this->get('/qopenpanel/templates/'.$installed['resource_id'].'/download');
+        $response = $this->get('/openpanel/templates/'.$installed['resource_id'].'/download');
         $response->assertOk()->assertDownload('static-site-1.0.0.zip');
         $path = $response->baseResponse->getFile()->getPathname();
         $zip = new \ZipArchive;
@@ -229,7 +229,7 @@ class TemplatesTest extends TestCase
         $user = $this->account();
         $token = 'qpm_'.bin2hex(random_bytes(48));
         DB::table('qopenpanel_mcp_grants')->insert(['id' => (string) Str::uuid(), 'user_id' => $user->id, 'token_hash' => hash('sha256', $token), 'scopes' => json_encode(['panel:read']), 'expires_at' => now()->addHour(), 'created_at' => now(), 'updated_at' => now()]);
-        $this->postJson('/qopenpanel/mcp/panel', ['jsonrpc' => '2.0', 'id' => 1, 'method' => 'tools/call', 'params' => ['name' => 'project_templates', 'arguments' => ['action' => 'install', ...$this->payload()]]], ['Authorization' => 'Bearer '.$token, 'MCP-Protocol-Version' => '2025-11-25'])->assertOk()->assertJsonPath('result.content.0.text', 'forbidden');
+        $this->postJson('/openpanel/mcp/panel', ['jsonrpc' => '2.0', 'id' => 1, 'method' => 'tools/call', 'params' => ['name' => 'project_templates', 'arguments' => ['action' => 'install', ...$this->payload()]]], ['Authorization' => 'Bearer '.$token, 'MCP-Protocol-Version' => '2025-11-25'])->assertOk()->assertJsonPath('result.content.0.text', 'forbidden');
         $this->assertDatabaseCount('qopenpanel_template_installations', 0);
     }
 }

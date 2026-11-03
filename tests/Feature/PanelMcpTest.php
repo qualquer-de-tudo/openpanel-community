@@ -43,7 +43,7 @@ class PanelMcpTest extends TestCase
 
     private function rpc(string $token, string $method, array $params = []): TestResponse
     {
-        return $this->postJson('/qopenpanel/mcp/panel', ['jsonrpc' => '2.0', 'id' => 1, 'method' => $method, 'params' => (object) $params], ['Authorization' => 'Bearer '.$token, 'MCP-Protocol-Version' => '2025-11-25', 'Mcp-Method' => $method]);
+        return $this->postJson('/openpanel/mcp/panel', ['jsonrpc' => '2.0', 'id' => 1, 'method' => $method, 'params' => (object) $params], ['Authorization' => 'Bearer '.$token, 'MCP-Protocol-Version' => '2025-11-25', 'Mcp-Method' => $method]);
     }
 
     private function callTool(string $token, string $name, array $arguments = []): TestResponse
@@ -68,7 +68,7 @@ class PanelMcpTest extends TestCase
 
     public function test_mcp_requires_its_own_token_even_for_signed_in_users(): void
     {
-        $this->actingAs($this->account())->postJson('/qopenpanel/mcp/panel', ['method' => 'tools/list'])->assertUnauthorized()->assertJsonPath('error', 'invalid_mcp_access');
+        $this->actingAs($this->account())->postJson('/openpanel/mcp/panel', ['method' => 'tools/list'])->assertUnauthorized()->assertJsonPath('error', 'invalid_mcp_access');
     }
 
     public function test_expired_and_revoked_grants_return_401(): void
@@ -321,7 +321,7 @@ class PanelMcpTest extends TestCase
 
     public function test_public_form_rejects_credentials_embedded_in_repository_urls(): void
     {
-        $this->actingAs($this->account())->post('/qopenpanel/resources', ['kind' => 'sites', 'name' => 'safe', 'engine' => 'Laravel', 'disk_mb' => 512, 'repository' => 'https://user:password@github.com/example/app'])->assertSessionHasErrors('repository');
+        $this->actingAs($this->account())->post('/openpanel/resources', ['kind' => 'sites', 'name' => 'safe', 'engine' => 'Laravel', 'disk_mb' => 512, 'repository' => 'https://user:password@github.com/example/app'])->assertSessionHasErrors('repository');
         $this->assertDatabaseCount('qopenpanel_resources', 0);
     }
 

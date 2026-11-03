@@ -211,7 +211,7 @@ op_prepare_dependencies
 
 script_dir=""
 if [[ -f "${BASH_SOURCE[0]:-}" ]]; then script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd); fi
-requested_version=${QOPENPANEL_VERSION:-v0.7.0-beta.1}
+requested_version=${QOPENPANEL_VERSION:-v0.7.0-beta.2}
 [[ "$requested_version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta|rc)\.[0-9]+)?$ ]] || { echo 'Invalid release tag.' >&2; return 1; }
 if [[ -n "$script_dir" ]] && op_is_package "$script_dir"; then
   cd -- "$script_dir"
@@ -266,7 +266,7 @@ if [[ "$private" == false ]] && ! op_compose exec -T panel php artisan qopenpane
   echo 'Choose the account password in the following hidden terminal prompt.'
   op_compose exec panel php artisan panel:account "$admin_email" --name="$admin_name"
 elif [[ "$private" == true ]]; then
-  echo 'Private installation ready. Create the first account at http://127.0.0.1:8080/qopenpanel/login through an SSH tunnel.'
+  echo 'Private installation ready. Create the first account at http://127.0.0.1:8080/openpanel/login through an SSH tunnel.'
   echo 'Tunnel: ssh -L 8080:127.0.0.1:8080 operator@SERVER_IP'
   exit 0
 fi
@@ -277,14 +277,14 @@ if [[ -n "$domain" ]]; then
   printf 'PANEL_DOMAIN=%s\n' "$domain" > deploy.env
   op_compose --env-file deploy.env -f compose.yaml -f compose.production.yaml config --quiet
   op_compose --env-file deploy.env -f compose.yaml -f compose.production.yaml up -d
-  echo "QOpenPanel: https://$domain/qopenpanel (DNS must already point to this server; ports 80 and 443 must be reachable.)"
+  echo "OpenPanel: https://$domain/openpanel (DNS must already point to this server; ports 80 and 443 must be reachable.)"
 elif [[ -n "$address" ]]; then
   printf 'PANEL_BIND=0.0.0.0\nPANEL_PORT=8080\nPANEL_URL=http://%s:8080\n' "$address" > deploy.env
   op_compose --env-file deploy.env up -d
-  echo "QOpenPanel: http://$address:8080/qopenpanel"
+  echo "OpenPanel: http://$address:8080/openpanel"
   echo 'IP mode uses HTTP. Restrict access to a trusted network or use an SSH tunnel until HTTPS is configured.'
 else
-  echo 'QOpenPanel: http://127.0.0.1:8080/qopenpanel (use an SSH tunnel for remote access).'
+  echo 'OpenPanel: http://127.0.0.1:8080/openpanel (use an SSH tunnel for remote access).'
 fi
 
 }

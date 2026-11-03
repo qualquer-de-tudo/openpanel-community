@@ -119,7 +119,7 @@ class AgentTests(unittest.TestCase):
             elif "qopenpanel:maintenance-health" in args and failure in ["health", "restore"]:
                 raise agent.Failure("health_check_failed")
             elif "wget" in args:
-                return 'data-qopenpanel-path="/qopenpanel" /vendor/qopenpanel/assets/app.js'
+                return 'data-qopenpanel-path="/openpanel" /vendor/qopenpanel/assets/app.js'
             elif "up" in args and not any(str(value).endswith("-private.yaml") for value in args) and failure == "promotion":
                 raise agent.Failure("command_failed")
             elif args[-1] == "tar -C /data -xzf /backup.tar.gz" and failure == "restore":

@@ -64,9 +64,9 @@ class MaintenanceTest extends TestCase
 
     public function test_host_maintenance_is_not_available_to_guests_or_regular_tenants(): void
     {
-        $this->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertRedirect('/qopenpanel/login');
-        $this->actingAs(User::factory()->create())->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertForbidden();
-        $this->getJson('/qopenpanel/maintenance/releases?channel=beta')->assertForbidden();
+        $this->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertRedirect('/openpanel/login');
+        $this->actingAs(User::factory()->create())->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertForbidden();
+        $this->getJson('/openpanel/maintenance/releases?channel=beta')->assertForbidden();
         $this->assertDatabaseCount('qopenpanel_maintenance_jobs', 0);
         Http::assertNothingSent();
     }
@@ -84,13 +84,13 @@ class MaintenanceTest extends TestCase
     public function test_release_channels_exclude_drafts_unstable_tags_and_untrusted_urls(): void
     {
         $this->releases();
-        $this->actingAs($this->operator())->getJson('/qopenpanel/maintenance/releases?channel=stable')->assertOk()->assertJsonCount(1, 'releases')->assertJsonPath('releases.0.tag', 'v0.8.0');
-        $this->getJson('/qopenpanel/maintenance/releases?channel=beta')->assertOk()->assertJsonCount(2, 'releases')->assertJsonPath('releases.0.url', 'https://github.com/qualquer-de-tudo/openpanel-community/releases/tag/v0.8.0-beta.1');
+        $this->actingAs($this->operator())->getJson('/openpanel/maintenance/releases?channel=stable')->assertOk()->assertJsonCount(1, 'releases')->assertJsonPath('releases.0.tag', 'v0.8.0');
+        $this->getJson('/openpanel/maintenance/releases?channel=beta')->assertOk()->assertJsonCount(2, 'releases')->assertJsonPath('releases.0.url', 'https://github.com/qualquer-de-tudo/openpanel-community/releases/tag/v0.8.0-beta.1');
     }
 
     public function test_scan_writes_only_a_bounded_protocol_job_without_credentials(): void
     {
-        $this->actingAs($this->operator())->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertRedirect();
+        $this->actingAs($this->operator())->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertRedirect();
         $job = DB::table('qopenpanel_maintenance_jobs')->first();
         $payload = json_decode(file_get_contents($this->directory.'/requests/'.$job->id.'.json'), true);
         $this->assertSame('scan', $payload['action']);
@@ -102,8 +102,8 @@ class MaintenanceTest extends TestCase
 
     public function test_update_requires_reauthentication_and_explicit_acknowledgement(): void
     {
-        $this->actingAs($this->operator())->post('/qopenpanel/maintenance/request', $this->updatePayload(['password' => 'incorrect']))->assertSessionHasErrors('password');
-        $this->post('/qopenpanel/maintenance/request', $this->updatePayload(['acknowledge' => false]))->assertSessionHasErrors('acknowledge');
+        $this->actingAs($this->operator())->post('/openpanel/maintenance/request', $this->updatePayload(['password' => 'incorrect']))->assertSessionHasErrors('password');
+        $this->post('/openpanel/maintenance/request', $this->updatePayload(['acknowledge' => false]))->assertSessionHasErrors('acknowledge');
         $this->assertDatabaseCount('qopenpanel_maintenance_jobs', 0);
         Http::assertNothingSent();
     }
@@ -111,7 +111,7 @@ class MaintenanceTest extends TestCase
     public function test_valid_update_is_pinned_to_a_commit_and_never_queues_the_password(): void
     {
         $this->releases();
-        $this->actingAs($this->operator())->post('/qopenpanel/maintenance/request', $this->updatePayload())->assertRedirect();
+        $this->actingAs($this->operator())->post('/openpanel/maintenance/request', $this->updatePayload())->assertRedirect();
         $job = DB::table('qopenpanel_maintenance_jobs')->first();
         $text = file_get_contents($this->directory.'/requests/'.$job->id.'.json');
         $this->assertSame(str_repeat('a', 40), json_decode($text, true)['sha']);
@@ -122,7 +122,7 @@ class MaintenanceTest extends TestCase
     public function test_stale_agent_blocks_jobs_without_claiming_success(): void
     {
         file_put_contents($this->directory.'/agent.json', json_encode(['timestamp' => time() - 3600]));
-        $this->actingAs($this->operator())->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertSessionHasErrors('action');
+        $this->actingAs($this->operator())->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertSessionHasErrors('action');
         $this->assertDatabaseCount('qopenpanel_maintenance_jobs', 0);
     }
 
@@ -130,7 +130,7 @@ class MaintenanceTest extends TestCase
     {
         $user = User::factory()->create();
         DB::table('qopenpanel_accounts')->insert(['user_id' => $user->id]);
-        $this->actingAs($user)->get('/qopenpanel')->assertInertia(fn (AssertableInertia $page) => $page->where('maintenance', null));
+        $this->actingAs($user)->get('/openpanel')->assertInertia(fn (AssertableInertia $page) => $page->where('maintenance', null));
     }
 
     public function test_release_reads_do_not_consume_the_write_rate_limit(): void
@@ -138,15 +138,15 @@ class MaintenanceTest extends TestCase
         $this->releases();
         $this->actingAs($this->operator());
         for ($index = 0; $index < 6; $index++) {
-            $this->getJson('/qopenpanel/maintenance/releases?channel=stable')->assertOk();
+            $this->getJson('/openpanel/maintenance/releases?channel=stable')->assertOk();
         }
-        $this->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertSessionHasNoErrors()->assertRedirect();
+        $this->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertSessionHasNoErrors()->assertRedirect();
         $this->assertDatabaseCount('qopenpanel_maintenance_jobs', 1);
     }
 
     public function test_free_form_commands_are_refused_and_never_dispatched(): void
     {
-        $this->actingAs($this->operator())->post('/qopenpanel/maintenance/request', ['action' => 'scan', 'command' => 'arbitrary'])->assertUnprocessable();
+        $this->actingAs($this->operator())->post('/openpanel/maintenance/request', ['action' => 'scan', 'command' => 'arbitrary'])->assertUnprocessable();
         $this->assertDatabaseCount('qopenpanel_maintenance_jobs', 0);
     }
 
@@ -167,7 +167,7 @@ class MaintenanceTest extends TestCase
     public function test_permission_revocation_invalidates_pending_agent_authorization(): void
     {
         $user = $this->operator();
-        $this->actingAs($user)->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertRedirect();
+        $this->actingAs($user)->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertRedirect();
         $job = DB::table('qopenpanel_maintenance_jobs')->first();
         $arguments = ['id' => $job->id, 'action' => 'scan', 'target' => '-', 'sha' => '-'];
         $this->artisan('qopenpanel:maintenance-authorize', $arguments)->assertSuccessful();
@@ -179,7 +179,7 @@ class MaintenanceTest extends TestCase
     {
         rmdir($this->directory.'/requests');
         try {
-            $this->actingAs($this->operator())->post('/qopenpanel/maintenance/request', ['action' => 'scan'])->assertSessionHasErrors('action');
+            $this->actingAs($this->operator())->post('/openpanel/maintenance/request', ['action' => 'scan'])->assertSessionHasErrors('action');
             $this->assertDatabaseHas('qopenpanel_maintenance_jobs', ['dispatch_failed' => true]);
         } finally {
             mkdir($this->directory.'/requests', 0700);

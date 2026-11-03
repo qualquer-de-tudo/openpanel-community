@@ -4,7 +4,7 @@
 
 [Demo interativa](https://qualquer-de-tudo.github.io/openpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
-> **Versão 0.7.0-beta.1 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+> **Versão 0.7.0-beta.2 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
 ## Módulo instalável em Laravel
 
@@ -16,7 +16,7 @@ composer require "qualquer-de-tudo/openpanel-community:^0.7@beta"
 php artisan qopenpanel:install --force
 ```
 
-Crie a primeira conta em `/qopenpanel/login` antes de publicar. Para servidor sem Laravel, execute `bash install.sh --private`: ele prepara Laravel e instala o pacote dentro do Docker. Também aceita `--ip SEU_IP` ou `--domain painel.example.com`, criando a conta pelo terminal antes da exposição pública. [Instalação, domínio posterior e migração da beta anterior](docs/MODULE.md).
+Crie a primeira conta em `/openpanel/login` antes de publicar. Para servidor sem Laravel, execute `bash install.sh --private`: ele prepara Laravel e instala o pacote dentro do Docker. Também aceita `--ip SEU_IP` ou `--domain painel.example.com`, criando a conta pelo terminal antes da exposição pública. [Instalação, domínio posterior e migração da beta anterior](docs/MODULE.md).
 
 ![Dashboard de demonstração do OpenPanel](docs/demo-preview.png)
 
@@ -36,7 +36,7 @@ Em Ubuntu ou Debian suportado, o instalador prepara as dependências automaticam
 curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/qualquer-de-tudo/openpanel-community/main/install.sh | sudo bash -s -- --private
 ```
 
-Abra localmente `http://127.0.0.1:8080/qopenpanel/login`. Para acessar sua VPS, execute no seu computador:
+Abra localmente `http://127.0.0.1:8080/openpanel/login`. Para acessar sua VPS, execute no seu computador:
 
 ```bash
 ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR

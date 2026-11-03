@@ -1,6 +1,6 @@
 # MCP para IAs — QOpenPanel
 
-O endpoint `POST /qopenpanel/mcp/panel` implementa MCP com o pacote oficial `laravel/mcp`. O cliente conecta por Streamable HTTP com uma credencial dedicada ou pela ponte local `bin/mcp-bridge.mjs`, que lê a credencial em um arquivo privado sem colocá-la no contexto de ferramentas do modelo. A demo pública estática não oferece MCP.
+O endpoint `POST /openpanel/mcp/panel` implementa MCP com o pacote oficial `laravel/mcp`. O cliente conecta por Streamable HTTP com uma credencial dedicada ou pela ponte local `bin/mcp-bridge.mjs`, que lê a credencial em um arquivo privado sem colocá-la no contexto de ferramentas do modelo. A demo pública estática não oferece MCP.
 
 ## O que a IA pode fazer
 
@@ -35,7 +35,7 @@ docker compose exec panel sh -c 'mkdir -p /data/private-mcp && chmod 700 /data/p
 # Acesso inicial somente de leitura, por sete dias.
 docker compose exec panel php artisan panel:mcp-grant admin@example.com \
   /data/private-mcp/client.mcp-private.json \
-  --endpoint=https://painel.seudominio.com/qopenpanel/mcp/panel \
+  --endpoint=https://painel.seudominio.com/openpanel/mcp/panel \
   --scopes=panel:read --days=7
 ```
 

@@ -11,7 +11,7 @@ class InstallPanel extends Command
 {
     protected $signature = 'qopenpanel:install {--force : Run package migrations in production} {--check : Check that an initial account exists without changing anything} {--check-legacy : Detect the old SQLite panel without changing anything}';
 
-    protected $description = 'Install the isolated QOpenPanel module without replacing host files';
+    protected $description = 'Install the isolated OpenPanel module without replacing host files';
 
     public function handle(): int
     {
@@ -27,7 +27,7 @@ class InstallPanel extends Command
         if ($status !== 0) {
             return self::FAILURE;
         }
-        $this->info('QOpenPanel: '.url(trim(config('qopenpanel.path'), '/').'/login'));
+        $this->info('OpenPanel: '.url(trim(config('qopenpanel.path'), '/').'/login'));
         $this->line('Create the first account through a private SSH tunnel, or run panel:account. No default password.');
 
         return self::SUCCESS;
