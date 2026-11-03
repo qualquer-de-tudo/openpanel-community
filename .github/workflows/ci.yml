@@ -27,6 +27,7 @@ jobs:
       - run: npm run translations:check
       - run: npm run test:i18n
       - run: npm run build
+      - run: npm run build:package
       - run: npm run build:demo
       - run: php artisan test
       - run: php artisan panel:templates-check
@@ -38,4 +39,19 @@ jobs:
       - run: node --test tests/Unit/mcp-bridge.test.mjs
       - run: docker compose config --quiet
       - run: PANEL_DOMAIN=panel.example.com docker compose -f compose.yaml -f compose.production.yaml config --quiet
+      - run: for script in install.sh docker/install.sh docker/entrypoint.sh; do bash -n "$script"; done
       - run: docker compose build
+      - name: Test module in a clean Laravel application
+        run: |
+          docker compose up -d --no-build
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8080/qopenpanel/login > /tmp/panel-login.html; then break; fi
+            sleep 2
+          done
+          grep -q '/vendor/qopenpanel/assets/' /tmp/panel-login.html
+          docker compose exec -T panel php artisan qopenpanel:install --force
+          docker compose exec -T panel php artisan route:cache
+          docker compose exec -T panel php artisan config:cache
+          curl --fail --silent http://127.0.0.1:8080/qopenpanel/login > /tmp/panel-cached.html
+          grep -q 'data-qopenpanel-path="/qopenpanel"' /tmp/panel-cached.html
+          docker compose exec -T panel composer show qualquer-de-tudo/qopenpanel-community --path

@@ -5,7 +5,9 @@ vendor
 .env.*
 !.env.example
 .ai-logs
-storage/logs/*
+storage
+public/storage
+public/vendor
 database/*.sqlite
 public/hot
 public/build

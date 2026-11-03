@@ -1,37 +1,38 @@
 {
-  "$schema": "https://www.schemastore.org/package.json",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "vite build",
-    "dev": "vite",
-    "build:demo": "vite build --config vite.demo.config.js && node demo/finalize.mjs",
-    "preview:demo": "vite preview --config vite.demo.config.js --host 127.0.0.1",
-    "translations:check": "node bin/translations.mjs check",
-    "translations:add": "node bin/translations.mjs add",
-    "translations:sync": "node bin/translations.mjs sync",
-    "translations:status": "node bin/translations.mjs status",
-    "test:i18n": "node --test tests/Unit/i18n.test.mjs",
-    "templates:new": "node bin/template-new.mjs",
-    "templates:lock": "php artisan panel:templates-lock",
-    "templates:check": "php artisan panel:templates-check"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0",
-    "@vitejs/plugin-react": "^6.2.1",
-    "concurrently": "^10.0.3",
-    "laravel-vite-plugin": "^3.1",
-    "prettier": "^3.9.10",
-    "tailwindcss": "^4.0.0",
-    "vite": "^8.0.0"
-  },
-  "optionalDependencies": {
-    "@laravel/multiplex": "^0.4.1"
-  },
-  "dependencies": {
-    "@inertiajs/react": "^3.11.0",
-    "lucide-react": "^1.67.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
-  }
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "build:demo": "vite build --config vite.demo.config.js && node demo/finalize.mjs",
+        "preview:demo": "vite preview --config vite.demo.config.js --host 127.0.0.1",
+        "translations:check": "node bin/translations.mjs check",
+        "translations:add": "node bin/translations.mjs add",
+        "translations:sync": "node bin/translations.mjs sync",
+        "translations:status": "node bin/translations.mjs status",
+        "test:i18n": "node --test tests/Unit/i18n.test.mjs",
+        "templates:new": "node bin/template-new.mjs",
+        "templates:lock": "php artisan panel:templates-lock",
+        "templates:check": "php artisan panel:templates-check",
+        "build:package": "vite build --config vite.package.config.js"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "@vitejs/plugin-react": "^6.2.1",
+        "concurrently": "^10.0.3",
+        "laravel-vite-plugin": "^3.1",
+        "prettier": "^3.9.10",
+        "tailwindcss": "^4.0.0",
+        "vite": "^8.0.0"
+    },
+    "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "@inertiajs/react": "^3.11.0",
+        "lucide-react": "^1.67.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1"
+    }
 }

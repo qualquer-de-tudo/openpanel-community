@@ -1,3 +1,4 @@
+import { panelUrl } from "./panel-url.mjs";
 import React, { useState } from "react";
 import { useForm } from "@inertiajs/react";
 import {
@@ -57,7 +58,7 @@ export default function Templates({
             );
             return;
         }
-        form.post("/templates/install", {
+        form.post(panelUrl("/templates/install"), {
             onSuccess: () => setSelected(null),
             preserveScroll: true,
         });
@@ -76,7 +77,7 @@ export default function Templates({
                 ...payload,
                 expected_revision: resource.revision,
             }))
-            .post(`/templates/${resource.id}/${action}`, {
+            .post(panelUrl(`/templates/${resource.id}/${action}`), {
                 preserveScroll: true,
             });
     };
@@ -206,7 +207,7 @@ export default function Templates({
                                     ) : (
                                         <a
                                             className="secondary template-export"
-                                            href={`/templates/${resource.id}/download`}
+                                            href={panelUrl(`/templates/${resource.id}/download`)}
                                         >
                                             <Download size={15} />
                                             {t("Exportar projeto")}

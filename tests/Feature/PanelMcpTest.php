@@ -2,10 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Resource;
-use App\Models\User;
-use App\Services\PanelAutomation;
-use App\Services\PrivateFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +9,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\TestWith;
+use QOpenPanel\Community\Models\Resource;
+use QOpenPanel\Community\Models\User;
+use QOpenPanel\Community\Services\PanelAutomation;
+use QOpenPanel\Community\Services\PrivateFile;
 use Tests\TestCase;
 
 class PanelMcpTest extends TestCase
@@ -22,7 +22,7 @@ class PanelMcpTest extends TestCase
     private function account(): User
     {
         $u = User::factory()->create();
-        DB::table('accounts')->insert(['user_id' => $u->id, 'disk_mb' => 2048, 'memory_mb' => 512, 'project_limit' => 2, 'database_limit' => 1]);
+        DB::table('qopenpanel_accounts')->insert(['user_id' => $u->id, 'disk_mb' => 2048, 'memory_mb' => 512, 'project_limit' => 2, 'database_limit' => 1]);
 
         return $u;
     }
@@ -36,14 +36,14 @@ class PanelMcpTest extends TestCase
     {
         $token = 'qpm_'.bin2hex(random_bytes(48));
         $id = (string) Str::uuid();
-        DB::table('mcp_grants')->insert(['id' => $id, 'user_id' => $user->id, 'token_hash' => hash('sha256', $token), 'scopes' => json_encode($scopes), 'resource_ids' => $ids === null ? null : json_encode($ids), 'expires_at' => now()->addHour(), 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('qopenpanel_mcp_grants')->insert(['id' => $id, 'user_id' => $user->id, 'token_hash' => hash('sha256', $token), 'scopes' => json_encode($scopes), 'resource_ids' => $ids === null ? null : json_encode($ids), 'expires_at' => now()->addHour(), 'created_at' => now(), 'updated_at' => now()]);
 
         return [$token, $id];
     }
 
     private function rpc(string $token, string $method, array $params = []): TestResponse
     {
-        return $this->postJson('/mcp/panel', ['jsonrpc' => '2.0', 'id' => 1, 'method' => $method, 'params' => (object) $params], ['Authorization' => 'Bearer '.$token, 'MCP-Protocol-Version' => '2025-11-25', 'Mcp-Method' => $method]);
+        return $this->postJson('/qopenpanel/mcp/panel', ['jsonrpc' => '2.0', 'id' => 1, 'method' => $method, 'params' => (object) $params], ['Authorization' => 'Bearer '.$token, 'MCP-Protocol-Version' => '2025-11-25', 'Mcp-Method' => $method]);
     }
 
     private function callTool(string $token, string $name, array $arguments = []): TestResponse
@@ -61,14 +61,14 @@ class PanelMcpTest extends TestCase
     private function githubSecret(User $user, Resource $resource): string
     {
         $id = (string) Str::uuid();
-        DB::table('vault_secrets')->insert(['id' => $id, 'user_id' => $user->id, 'resource_id' => $resource->id, 'purpose' => 'github', 'repository' => $resource->repository, 'ciphertext' => Crypt::encryptString('github_private_fixture_123456789'), 'version' => 1, 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('qopenpanel_vault_secrets')->insert(['id' => $id, 'user_id' => $user->id, 'resource_id' => $resource->id, 'purpose' => 'github', 'repository' => $resource->repository, 'ciphertext' => Crypt::encryptString('github_private_fixture_123456789'), 'version' => 1, 'created_at' => now(), 'updated_at' => now()]);
 
         return $id;
     }
 
     public function test_mcp_requires_its_own_token_even_for_signed_in_users(): void
     {
-        $this->actingAs($this->account())->postJson('/mcp/panel', ['method' => 'tools/list'])->assertUnauthorized()->assertJsonPath('error', 'invalid_mcp_access');
+        $this->actingAs($this->account())->postJson('/qopenpanel/mcp/panel', ['method' => 'tools/list'])->assertUnauthorized()->assertJsonPath('error', 'invalid_mcp_access');
     }
 
     public function test_expired_and_revoked_grants_return_401(): void
@@ -78,7 +78,7 @@ class PanelMcpTest extends TestCase
         $this->travel(2)->hours();
         $this->rpc($token, 'tools/list')->assertUnauthorized();
         $this->travelBack();
-        DB::table('mcp_grants')->where('id', $id)->update(['revoked_at' => now()]);
+        DB::table('qopenpanel_mcp_grants')->where('id', $id)->update(['revoked_at' => now()]);
         $this->rpc($token, 'tools/list')->assertUnauthorized();
     }
 
@@ -116,8 +116,8 @@ class PanelMcpTest extends TestCase
     {
         [$token] = $this->grant($this->account(), ['panel:read']);
         $this->callTool($token, $tool, $arguments)->assertOk()->assertJsonPath('result.content.0.text', 'forbidden');
-        $this->assertDatabaseCount('vault_secrets', 0);
-        $this->assertDatabaseCount('project_versions', 0);
+        $this->assertDatabaseCount('qopenpanel_vault_secrets', 0);
+        $this->assertDatabaseCount('qopenpanel_project_versions', 0);
     }
 
     public function test_configuration_crud_uses_quotas_and_expected_revisions(): void
@@ -127,13 +127,13 @@ class PanelMcpTest extends TestCase
         $config = ['action' => 'create', 'kind' => 'sites', 'name' => 'created', 'engine' => 'Laravel', 'disk_mb' => 512];
         $data = $this->toolResult($this->callTool($token, 'panel_configure', $config));
         $id = $data['resource']['id'];
-        $this->assertDatabaseHas('resources', ['id' => $id, 'status' => 'planned', 'revision' => 1]);
+        $this->assertDatabaseHas('qopenpanel_resources', ['id' => $id, 'status' => 'planned', 'revision' => 1]);
         $this->callTool($token, 'panel_configure', [...$config, 'name' => 'too-large', 'disk_mb' => 3000])->assertOk()->assertJsonPath('result.content.0.text', 'validation_failed');
         $updated = $this->toolResult($this->callTool($token, 'panel_configure', [...$config, 'action' => 'update', 'resource_id' => $id, 'expected_revision' => 1, 'name' => 'updated']));
         $this->assertSame(2, $updated['resource']['revision']);
         $this->callTool($token, 'panel_configure', [...$config, 'action' => 'update', 'resource_id' => $id, 'expected_revision' => 1])->assertOk()->assertJsonPath('result.content.0.text', 'revision_or_state_conflict');
         $this->toolResult($this->callTool($token, 'panel_configure', ['action' => 'delete', 'resource_id' => $id, 'expected_revision' => 2]));
-        $this->assertDatabaseMissing('resources', ['id' => $id]);
+        $this->assertDatabaseMissing('qopenpanel_resources', ['id' => $id]);
     }
 
     public function test_cross_account_resource_write_and_secret_access_are_not_found(): void
@@ -143,7 +143,7 @@ class PanelMcpTest extends TestCase
         [$token] = $this->grant($first);
         $this->callTool($token, 'panel_configure', ['action' => 'delete', 'resource_id' => $foreign->id, 'expected_revision' => 1])->assertOk()->assertJsonPath('result.content.0.text', 'not_found');
         $this->callTool($token, 'vault_manage', ['action' => 'list', 'resource_id' => $foreign->id])->assertOk()->assertJsonPath('result.content.0.text', 'not_found');
-        $this->assertDatabaseHas('resources', ['id' => $foreign->id]);
+        $this->assertDatabaseHas('qopenpanel_resources', ['id' => $foreign->id]);
     }
 
     public function test_generated_secrets_are_encrypted_bound_and_never_returned_in_tools_or_audit(): void
@@ -153,21 +153,21 @@ class PanelMcpTest extends TestCase
         [$token] = $this->grant($user);
         $created = $this->callTool($token, 'vault_manage', ['action' => 'generate', 'resource_id' => $resource->id]);
         $reference = $this->toolResult($created)['reference'];
-        $row = DB::table('vault_secrets')->where('id', $reference)->first();
+        $row = DB::table('qopenpanel_vault_secrets')->where('id', $reference)->first();
         $plain = Crypt::decryptString($row->ciphertext);
         $this->assertMatchesRegularExpression('/^[a-f0-9]{96}$/', $plain);
         $this->assertNotSame($plain, $row->ciphertext);
         $created->assertDontSee($plain, false);
         $bound = $this->toolResult($this->callTool($token, 'vault_manage', ['action' => 'bind', 'resource_id' => $resource->id, 'reference' => $reference, 'variable' => 'DB_PASSWORD']));
         $this->assertSame(2, $bound['revision']);
-        $this->assertDatabaseHas('secret_bindings', ['secret_id' => $reference, 'variable' => 'DB_PASSWORD']);
+        $this->assertDatabaseHas('qopenpanel_secret_bindings', ['secret_id' => $reference, 'variable' => 'DB_PASSWORD']);
         $list = $this->callTool($token, 'vault_manage', ['action' => 'list', 'resource_id' => $resource->id]);
         $list->assertDontSee($plain, false)->assertDontSee($row->ciphertext, false);
         $this->callTool($token, 'vault_manage', ['action' => 'read', 'resource_id' => $resource->id, 'reference' => $reference])->assertJsonPath('result.content.0.text', 'validation_failed');
         $rotated = $this->toolResult($this->callTool($token, 'vault_manage', ['action' => 'rotate', 'resource_id' => $resource->id, 'reference' => $reference]));
         $this->assertSame(2, $rotated['version']);
-        $this->assertNotSame($plain, Crypt::decryptString(DB::table('vault_secrets')->where('id', $reference)->value('ciphertext')));
-        $this->assertStringNotContainsString($plain, json_encode(DB::table('mcp_audit')->get()));
+        $this->assertNotSame($plain, Crypt::decryptString(DB::table('qopenpanel_vault_secrets')->where('id', $reference)->value('ciphertext')));
+        $this->assertStringNotContainsString($plain, json_encode(DB::table('qopenpanel_mcp_audit')->get()));
     }
 
     public function test_unknown_fields_cannot_override_owner_or_supply_credentials(): void
@@ -177,8 +177,8 @@ class PanelMcpTest extends TestCase
         [$token] = $this->grant($user);
         $this->callTool($token, 'vault_manage', ['action' => 'generate', 'resource_id' => $resource->id, 'value' => 'plaintext-not-allowed'])->assertJsonPath('result.content.0.text', 'validation_failed');
         $this->callTool($token, 'panel_configure', ['action' => 'create', 'user_id' => 999])->assertJsonPath('result.content.0.text', 'validation_failed');
-        $this->assertDatabaseCount('vault_secrets', 0);
-        $this->assertStringNotContainsString('plaintext-not-allowed', json_encode(DB::table('mcp_audit')->get()));
+        $this->assertDatabaseCount('qopenpanel_vault_secrets', 0);
+        $this->assertStringNotContainsString('plaintext-not-allowed', json_encode(DB::table('qopenpanel_mcp_audit')->get()));
     }
 
     public function test_versions_remain_immutable_and_restore_creates_new_revision(): void
@@ -192,11 +192,11 @@ class PanelMcpTest extends TestCase
         $restored = $this->toolResult($this->callTool($token, 'project_versions', ['action' => 'restore', 'resource_id' => $resource->id, 'expected_revision' => 2, 'version_id' => $snapshot['version_id']]));
         $this->assertSame('project', $restored['resource']['name']);
         $this->assertSame(3, $restored['resource']['revision']);
-        $this->assertDatabaseHas('project_versions', ['id' => $snapshot['version_id'], 'revision' => 1]);
+        $this->assertDatabaseHas('qopenpanel_project_versions', ['id' => $snapshot['version_id'], 'revision' => 1]);
         $plan = $this->toolResult($this->callTool($token, 'project_versions', ['action' => 'plan_deploy', 'resource_id' => $resource->id, 'version_id' => $snapshot['version_id']]));
         $this->assertFalse($plan['executed']);
         $this->assertSame('blocked_agent', $plan['status']);
-        $this->assertDatabaseHas('deployment_plans', ['id' => $plan['plan_id'], 'version_id' => $snapshot['version_id']]);
+        $this->assertDatabaseHas('qopenpanel_deployment_plans', ['id' => $plan['plan_id'], 'version_id' => $snapshot['version_id']]);
     }
 
     public function test_github_uses_internal_token_and_discards_provider_error_bodies(): void
@@ -250,7 +250,7 @@ class PanelMcpTest extends TestCase
         try {
             $data = json_decode(file_get_contents($path), true);
             $this->assertSame('http://127.0.0.1:8080/mcp/panel', $data['endpoint']);
-            $this->assertDatabaseHas('mcp_grants', ['id' => $data['grant_id'], 'token_hash' => hash('sha256', $data['token'])]);
+            $this->assertDatabaseHas('qopenpanel_mcp_grants', ['id' => $data['grant_id'], 'token_hash' => hash('sha256', $data['token'])]);
             $this->rpc($data['token'], 'tools/list')->assertOk();
             $this->artisan('panel:mcp-revoke', ['grant' => $data['grant_id']])->assertSuccessful();
             $this->rpc($data['token'], 'tools/list')->assertUnauthorized();
@@ -272,7 +272,7 @@ class PanelMcpTest extends TestCase
         $resource = $this->resource($user);
         [$token] = $this->grant($user, ['panel:write'], [$resource->id]);
         $this->callTool($token, 'panel_configure', ['action' => 'create', 'kind' => 'sites', 'name' => 'outside-grant', 'engine' => 'Laravel', 'disk_mb' => 512])->assertJsonPath('result.content.0.text', 'forbidden');
-        $this->assertDatabaseCount('resources', 1);
+        $this->assertDatabaseCount('qopenpanel_resources', 1);
     }
 
     public function test_version_restore_refuses_changed_secret_bindings(): void
@@ -321,8 +321,8 @@ class PanelMcpTest extends TestCase
 
     public function test_public_form_rejects_credentials_embedded_in_repository_urls(): void
     {
-        $this->actingAs($this->account())->post('/resources', ['kind' => 'sites', 'name' => 'safe', 'engine' => 'Laravel', 'disk_mb' => 512, 'repository' => 'https://user:password@github.com/example/app'])->assertSessionHasErrors('repository');
-        $this->assertDatabaseCount('resources', 0);
+        $this->actingAs($this->account())->post('/qopenpanel/resources', ['kind' => 'sites', 'name' => 'safe', 'engine' => 'Laravel', 'disk_mb' => 512, 'repository' => 'https://user:password@github.com/example/app'])->assertSessionHasErrors('repository');
+        $this->assertDatabaseCount('qopenpanel_resources', 0);
     }
 
     public function test_new_source_commits_can_be_versioned_without_configuration_changes(): void
@@ -335,7 +335,7 @@ class PanelMcpTest extends TestCase
         $this->assertSame(1, $first['revision']);
         $this->assertSame(2, $second['revision']);
         $this->assertSame(1, $second['resource_revision']);
-        $this->assertDatabaseCount('project_versions', 2);
+        $this->assertDatabaseCount('qopenpanel_project_versions', 2);
     }
 
     public function test_github_tree_returns_metadata_without_blob_contents(): void

@@ -1,5 +1,7 @@
 # Instalar em VPS ou servidor Linux
 
+> **0.5.0-beta.1:** o produto agora é um pacote Composer. Comece pelo [guia do módulo e do novo instalador](MODULE.md), que explica Laravel em `vendor`, identidade inicial, IP, domínio e importação da beta 0.4. Para modo privado, o fluxo abaixo continua disponível.
+
 ## Requisitos
 
 Use uma VM dedicada de avaliação, Ubuntu 24.04 LTS ou Debian com Docker Engine e o plugin Compose. Ponto de partida sugerido para construir a imagem: 2 vCPU, 2 GB RAM e 20 GB de disco; este é um dimensionamento inicial, não um benchmark. A carga futura dos serviços gerenciados não está incluída. A receita de domínio exige Compose >= 2.24.4 por usar `!override`.
@@ -21,7 +23,7 @@ Os comandos abaixo pressupõem permissão para usar Docker. Caso seu operador ex
 ```bash
 git clone https://github.com/qualquer-de-tudo/qopenpanel-community.git
 cd qopenpanel-community
-sh docker/install.sh
+bash install.sh --private
 ```
 
 O painel fica limitado a `127.0.0.1:8080` no servidor. No computador do administrador:
@@ -30,7 +32,7 @@ O painel fica limitado a `127.0.0.1:8080` no servidor. No computador do administ
 ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR
 ```
 
-Abra `http://127.0.0.1:8080` no computador e crie a primeira conta. A instalação vazia permite o cadastro inicial a quem acessá-la; conclua este passo antes de abrir o serviço à Internet. Também é possível operar permanentemente por túnel, sem domínio.
+Abra `http://127.0.0.1:8080/qopenpanel/login` no computador e crie a primeira conta. A instalação vazia permite o cadastro inicial a quem acessá-la; conclua este passo antes de abrir o serviço à Internet. Também é possível operar permanentemente por túnel, sem domínio.
 
 Para acesso direto ao IP em rede privada confiável, execute `PANEL_BIND=0.0.0.0 PANEL_URL=http://IP_DO_SERVIDOR:8080 docker compose up -d` e restrinja a porta 8080 na rede. Esse modo é HTTP e não deve transmitir credenciais pela Internet pública.
 
@@ -55,7 +57,7 @@ docker compose --env-file deploy.env -f compose.yaml -f compose.production.yaml 
 
 O Caddy solicita e renova HTTPS automaticamente quando DNS e conectividade estão corretos. A chave do Laravel e o banco permanecem em `panel-data`; certificados ficam em `caddy-data`. Veja a [documentação de HTTPS do Caddy](https://caddyserver.com/docs/automatic-https).
 
-Acesse `https://painel.seudominio.com`. No primeiro teste, use DNS direto, sem proxy de CDN. Se usar Cloudflare depois, mantenha TLS até a origem; esta receita não implementa DNS-01 pela API Cloudflare.
+Acesse `https://painel.seudominio.com/qopenpanel`. No primeiro teste, use DNS direto, sem proxy de CDN. Se usar Cloudflare depois, mantenha TLS até a origem; esta receita não implementa DNS-01 pela API Cloudflare.
 
 Portas publicadas pelo Docker podem contornar regras simples do UFW; use também o firewall do provedor e revise o [modelo de rede do Docker](https://docs.docker.com/engine/install/ubuntu/#firewall-limitations).
 
@@ -87,7 +89,7 @@ No modo domínio, substitua o comando `docker compose` pelo comando com `--env-f
 mkdir -p backups
 chmod 700 backups
 docker compose stop web panel
-docker compose run --rm --no-deps --entrypoint sh panel -c 'tar -C /data -czf - app.key database.sqlite' > "backups/panel-$(date +%Y%m%d-%H%M%S).tar.gz"
+docker compose run --rm --no-deps --entrypoint sh panel -c 'tar -C /data -czf - .' > "backups/panel-$(date +%Y%m%d-%H%M%S).tar.gz"
 docker compose start panel web
 chmod 600 backups/*.tar.gz
 ```
@@ -109,7 +111,7 @@ Preserve também `deploy.env` e uma cópia protegida dos volumes do Caddy confor
 - **502 ao iniciar:** aguarde migrations e confira logs de `panel`; o PHP-FPM deve estar disponível na rede interna.
 - **Erro de permissão no SQLite:** o volume da aplicação deve ser gravável pelo UID 1000. Evite montar bancos de outro proprietário sem ajustar permissões.
 - **Cookie/CSRF em domínio:** confira que a URL usa HTTPS e que você iniciou com o override de produção. Não reutilize cookies de outro endereço.
-- **Serviço continua planejado:** esperado na versão 0.1; a instalação do painel não provisiona os serviços do catálogo.
+- **Serviço continua planejado:** esperado nesta beta; a instalação do painel não provisiona os serviços do catálogo.
 
 ## Validação desta distribuição
 

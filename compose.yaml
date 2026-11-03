@@ -9,6 +9,7 @@ services:
             APP_ENV: production
             APP_DEBUG: "false"
             APP_LOCALE: pt_BR
+            QOPENPANEL_PATH: "${QOPENPANEL_PATH:-qopenpanel}"
             APP_URL: "${PANEL_URL:-http://localhost:8080}"
             DB_CONNECTION: sqlite
             DB_DATABASE: /data/database.sqlite

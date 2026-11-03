@@ -1,6 +1,6 @@
 # MCP para IAs — QOpenPanel
 
-O endpoint `POST /mcp/panel` implementa MCP com o pacote oficial `laravel/mcp`. O cliente conecta por Streamable HTTP com uma credencial dedicada ou pela ponte local `bin/mcp-bridge.mjs`, que lê a credencial em um arquivo privado sem colocá-la no contexto de ferramentas do modelo. A demo pública estática não oferece MCP.
+O endpoint `POST /qopenpanel/mcp/panel` implementa MCP com o pacote oficial `laravel/mcp`. O cliente conecta por Streamable HTTP com uma credencial dedicada ou pela ponte local `bin/mcp-bridge.mjs`, que lê a credencial em um arquivo privado sem colocá-la no contexto de ferramentas do modelo. A demo pública estática não oferece MCP.
 
 ## O que a IA pode fazer
 
@@ -35,7 +35,7 @@ docker compose exec panel sh -c 'mkdir -p /data/private-mcp && chmod 700 /data/p
 # Acesso inicial somente de leitura, por sete dias.
 docker compose exec panel php artisan panel:mcp-grant admin@example.com \
   /data/private-mcp/client.mcp-private.json \
-  --endpoint=https://painel.seudominio.com/mcp/panel \
+  --endpoint=https://painel.seudominio.com/qopenpanel/mcp/panel \
   --scopes=panel:read --days=7
 ```
 
@@ -128,3 +128,5 @@ Referências técnicas: [Laravel MCP](https://laravel.com/framework/docs/mcp), [
 ## Templates de projeto
 
 A ferramenta project_templates fornece catálogo, inspeção, instalação, atualização e rollback de templates fixados por versão. Gravação exige panel:write e versions:write. Consulte [templates da comunidade](TEMPLATES.md).
+
+Na 0.5, o endpoint acompanha `QOPENPANEL_PATH`. Concessões antigas podem precisar do novo endpoint no arquivo privado do cliente; nunca envie seu conteúdo ao modelo. Consulte [MODULE.md](MODULE.md) para importar a base anterior preservando a chave do cofre.

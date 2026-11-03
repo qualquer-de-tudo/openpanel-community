@@ -34,9 +34,7 @@ export function I18nProvider({ children, initialLocale }) {
             window.localStorage.setItem("qopenpanel.locale", locale);
         } catch {}
         document.cookie = `qopenpanel_locale=${encodeURIComponent(locale)}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
-        const isDemo = !document
-            .getElementById("app")
-            ?.hasAttribute("data-page");
+        const isDemo = !document.body.hasAttribute("data-qopenpanel-path");
         document.title = isDemo
             ? `OpenPanel · ${t("Demonstração pública")}`
             : "OpenPanel";

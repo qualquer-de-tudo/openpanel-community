@@ -1,9 +1,14 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
-    "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "name": "qualquer-de-tudo/qopenpanel-community",
+    "type": "library",
+    "description": "Versioned Linux hosting control panel module for Laravel",
+    "keywords": [
+        "laravel",
+        "control-panel",
+        "hosting",
+        "qopenpanel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.3",
@@ -24,14 +29,15 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "QOpenPanel\\Community\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
         }
     },
     "scripts": {
@@ -72,7 +78,10 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [],
+            "providers": [
+                "QOpenPanel\\Community\\Providers\\QOpenPanelServiceProvider"
+            ]
         }
     },
     "config": {
@@ -85,5 +94,24 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "archive": {
+        "exclude": [
+            "/app",
+            "/bootstrap",
+            "/tests",
+            "/.github",
+            "/node_modules",
+            "/vendor",
+            "/storage",
+            "/public",
+            "/.env",
+            "/database/migrations",
+            "/database/factories",
+            "/database/seeders",
+            "/artisan",
+            "/phpunit.xml",
+            "/composer.lock"
+        ]
+    }
 }

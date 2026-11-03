@@ -1,10 +1,22 @@
 # qopenpanel-community
 
-**Painel gratuito e open source para organizar a hospedagem de aplicações Linux.** Laravel 13 + React + Inertia, com licença MIT.
+**Módulo Laravel gratuito e open source para organizar a hospedagem de aplicações Linux.** Laravel 13 + React + Inertia, com licença MIT.
 
 [Demo interativa](https://qualquer-de-tudo.github.io/qopenpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
-> **Versão 0.4.0-beta.1 — beta de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+> **Versão 0.5.0-beta.1 — módulo Composer.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+
+## Módulo instalável em Laravel
+
+O produto agora fica em `vendor`, com provider auto descoberto, autenticação, tabelas, rotas e assets próprios. Compatibilidade inicial: Laravel 13 e Inertia 3.7+. O Laravel da raiz é um ambiente de desenvolvimento.
+
+```bash
+composer config repositories.qopenpanel vcs https://github.com/qualquer-de-tudo/qopenpanel-community.git
+composer require "qualquer-de-tudo/qopenpanel-community:^0.5@beta"
+php artisan qopenpanel:install --force
+```
+
+Crie a primeira conta em `/qopenpanel/login` antes de publicar. Para servidor sem Laravel, execute `bash install.sh --private`: ele prepara Laravel e instala o pacote dentro do Docker. Também aceita `--ip SEU_IP` ou `--domain painel.example.com`, criando a conta pelo terminal antes da exposição pública. [Instalação, domínio posterior e migração da beta anterior](docs/MODULE.md).
 
 ![Dashboard de demonstração do OpenPanel](docs/demo-preview.png)
 
@@ -23,10 +35,10 @@ Em um servidor Linux com Git, Docker Engine e Compose 2.24.4 ou superior:
 ```bash
 git clone https://github.com/qualquer-de-tudo/qopenpanel-community.git
 cd qopenpanel-community
-docker compose up -d --build
+bash install.sh --private
 ```
 
-Abra localmente `http://127.0.0.1:8080`. Para acessar sua VPS, execute no seu computador:
+Abra localmente `http://127.0.0.1:8080/qopenpanel/login`. Para acessar sua VPS, execute no seu computador:
 
 ```bash
 ssh -L 8080:127.0.0.1:8080 usuario@IP_DO_SERVIDOR
@@ -68,11 +80,12 @@ php artisan key:generate
 php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
 php artisan migrate
 npm ci
-npm run build
+npm run build:package
+php artisan qopenpanel:install
 php artisan serve
 ```
 
-Para hot reload, execute `npm run dev` em outro terminal. Para construir e visualizar a demo: `npm run build:demo` e `npm run preview:demo`.
+Para atualizar a interface do módulo, execute `npm run build:package` e publique novamente `qopenpanel-assets`. Para construir e visualizar a demo: `npm run build:demo` e `npm run preview:demo`.
 
 ```bash
 php artisan test

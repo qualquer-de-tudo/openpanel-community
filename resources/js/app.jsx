@@ -1,3 +1,4 @@
+import { panelUrl } from "./panel-url.mjs";
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { createInertiaApp, router, useForm } from "@inertiajs/react";
@@ -69,11 +70,11 @@ const descriptions = {
     integrations: "Conecte repositórios e assistentes de deploy.",
     marketplace: "Uma nova possibilidade para o seu servidor.",
 };
-function Login({ setup }) {
+function Login({ setup, defaults = {} }) {
     const { t } = useI18n();
     const f = useForm({
-        name: "",
-        email: "",
+        name: defaults.name || "",
+        email: defaults.email || "",
         password: "",
         password_confirmation: "",
     });
@@ -135,7 +136,7 @@ function Login({ setup }) {
                     }
                     onSubmit={(e) => {
                         e.preventDefault();
-                        f.post(setup ? "/setup" : "/login");
+                        f.post(panelUrl(setup ? "/setup" : "/login"));
                     }}
                 >
                     {(setup
@@ -242,7 +243,7 @@ export function Panel({
             );
             return;
         }
-        router.delete(url);
+        router.delete(panelUrl(url));
     };
     const used = resources.reduce((s, r) => s + r.disk_mb, 0);
     const projects = resources.filter((r) => r.kind === "sites");
@@ -343,7 +344,7 @@ export function Panel({
                                           "Você está navegando em uma demonstração pública, sem sessão administrativa.",
                                       ),
                                   )
-                                : router.post("/logout")
+                                : router.post(panelUrl("/logout"))
                         }
                         title={t("Sair")}
                     >
@@ -1070,7 +1071,7 @@ export function Panel({
                                     );
                                     return;
                                 }
-                                f.post("/resources", {
+                                f.post(panelUrl("/resources"), {
                                     onSuccess: () => setModal(null),
                                 });
                             }}
@@ -1252,7 +1253,10 @@ function ResourceTable({ rows, remove }) {
         </div>
     );
 }
-if (document.getElementById("app")?.hasAttribute("data-page"))
+if (
+    document.getElementById("app")?.hasAttribute("data-page") ||
+    document.querySelector('script[data-page="app"][type="application/json"]')
+)
     createInertiaApp({
         resolve: (name) => ({ Panel, Login })[name],
         setup({ el, App, props }) {

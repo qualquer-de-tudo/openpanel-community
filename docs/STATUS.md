@@ -32,3 +32,7 @@ Botão de instalação na demo, seis idiomas iniciais e catálogos compartilhado
 ## Beta 0.4.0-beta.1
 
 Templates de projeto versionados, catálogo comunitário via pull requests, exportação ZIP com lockfile, atualização e rollback com snapshots. Nenhum script de template é executado durante a instalação. O executor Linux permanece pendente.
+
+## 0.5.0-beta.1 — módulo Composer
+
+Pacote auto descoberto em `vendor`, tabelas/guard/configuração isolados, assets compilados e instalador que cria Laravel limpo no Docker. Importação opt-in da base SQLite 0.4, preservando originais. Compatibilidade inicial Laravel 13/Inertia 3; Octane não homologado. Executor Linux e imposição física de cotas continuam pendentes. [Arquitetura e instalação](MODULE.md).
