@@ -34,3 +34,5 @@ Thumbs.db
 *.pem
 *.pfx
 /.ai-logs/
+/private-mcp/
+*.mcp-private.json

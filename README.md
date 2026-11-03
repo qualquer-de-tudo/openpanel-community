@@ -2,7 +2,7 @@
 
 **Painel gratuito e open source para organizar a hospedagem de aplicações Linux.** Laravel 13 + React + Inertia, com licença MIT.
 
-[Demo interativa](https://qualquer-de-tudo.github.io/qopenpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md)
+[Demo interativa](https://qualquer-de-tudo.github.io/qopenpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
 > **Versão 0.1 — MVP de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
@@ -38,6 +38,10 @@ Crie sua conta pelo túnel antes de publicar o domínio. Não há senha padrão.
 - Configurações planejadas para sites, Docker Compose, bancos, runtimes, e-mail, SSL, proxy, segurança, cron e integrações.
 - Contas adicionais via `php artisan panel:account`, com senha solicitada no terminal.
 - Imagens Docker, persistência de dados e workflow de testes/build.
+
+## MCP para IAs
+
+O endpoint MCP permite descoberta, gestão de configurações, cofre de credenciais por referências opacas, snapshots e restauração de configurações, planos de deploy e um broker de versionamento GitHub. Concessões têm escopos, validade e revogação; o modelo não recebe os valores do cofre. Consulte [conexão, comandos e limites de segurança](docs/MCP.md). A demo estática não oferece acesso MCP.
 
 ## Provedores
 

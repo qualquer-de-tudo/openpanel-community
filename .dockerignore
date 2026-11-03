@@ -16,3 +16,5 @@ deploy.env
 backups
 *.pem
 *.key
+private-mcp
+*.mcp-private.json

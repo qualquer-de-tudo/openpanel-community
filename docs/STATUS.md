@@ -20,3 +20,7 @@
 Configurações salvas têm status `planned`. A aplicação não recebe socket Docker, acesso root nem credenciais de nuvem. Não há serviço gerenciado de hospedagem ou promessa de compatibilidade universal.
 
 Próximos marcos: agente Linux autenticado e auditável; receitas versionadas e testadas; deploys e certificados; isolamento efetivo por conta; backups e recuperação; integrações Git/IA com permissões restritas.
+
+## MCP (incremento da versão 0.2)
+
+Endpoint autenticado, permissões por conta/recurso, cofre criptografado sem retorno de valores, auditoria, versões de configuração, planos presos a commit e broker GitHub. Veja [MCP.md](MCP.md). Execução Linux, OAuth interativo e deploy efetivo continuam pendentes.

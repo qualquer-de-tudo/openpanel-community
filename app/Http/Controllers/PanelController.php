@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Resource;
 use App\Models\User;
+use App\Services\PanelAutomation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -64,24 +64,7 @@ class PanelController extends Controller
 
     public function store(Request $r)
     {
-        $catalog = config('catalog');
-        $r->validate(['kind' => ['required', 'string', Rule::in(array_keys($catalog))]]);
-        $data = $r->validate(['kind' => ['required', Rule::in(array_keys($catalog))], 'name' => ['required', 'string', 'max:63', 'regex:/^[a-z0-9][a-z0-9._-]*$/', Rule::unique('resources')->where(fn ($q) => $q->where('user_id', $r->user()->id)->where('kind', $r->input('kind')))], 'engine' => ['required', Rule::in($catalog[$r->input('kind')] ?? [])], 'domain' => ['nullable', 'string', 'max:253', 'regex:/^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63}$/'], 'repository' => ['nullable', 'url:https', 'max:500'], 'disk_mb' => 'required|integer|min:64|max:1048576']);
-        DB::transaction(function () use ($r, $data) {
-            $account = DB::table('accounts')->where('user_id', $r->user()->id)->lockForUpdate()->first();
-            abort_unless($account, 403);
-            $resources = Resource::where('user_id', $r->user()->id);
-            if ((clone $resources)->sum('disk_mb') + $data['disk_mb'] > $account->disk_mb) {
-                throw ValidationException::withMessages(['disk_mb' => 'A reserva ultrapassa o espaço disponível da conta.']);
-            }
-            $limit = match ($data['kind']) {
-                'sites' => $account->project_limit,'databases' => $account->database_limit,default => 100
-            };
-            if ((clone $resources)->where('kind', $data['kind'])->count() >= $limit) {
-                throw ValidationException::withMessages(['name' => 'Limite da conta atingido.']);
-            }
-            Resource::create([...$data, 'user_id' => $r->user()->id]);
-        });
+        app(PanelAutomation::class)->save($r->all());
 
         return back()->with('message', 'Configuração salva. Execução no Linux aguarda a integração do agente.');
     }
@@ -89,7 +72,7 @@ class PanelController extends Controller
     public function destroy(Request $r, Resource $resource)
     {
         abort_unless($resource->user_id === $r->user()->id, 404);
-        $resource->delete();
+        app(PanelAutomation::class)->remove($resource->id, $resource->revision);
 
         return back()->with('message', 'Configuração removida.');
     }

@@ -25,6 +25,7 @@ jobs:
       - run: npm run build
       - run: npm run build:demo
       - run: php artisan test
+      - run: node --test tests/Unit/mcp-bridge.test.mjs
       - run: docker compose config --quiet
       - run: PANEL_DOMAIN=panel.example.com docker compose -f compose.yaml -f compose.production.yaml config --quiet
       - run: docker compose build
