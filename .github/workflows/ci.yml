@@ -22,6 +22,8 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env && php artisan key:generate
       - run: npm ci
+      - run: npm run translations:check
+      - run: npm run test:i18n
       - run: npm run build
       - run: npm run build:demo
       - run: php artisan test

@@ -6,7 +6,12 @@
     "build": "vite build",
     "dev": "vite",
     "build:demo": "vite build --config vite.demo.config.js && node demo/finalize.mjs",
-    "preview:demo": "vite preview --config vite.demo.config.js --host 127.0.0.1"
+    "preview:demo": "vite preview --config vite.demo.config.js --host 127.0.0.1",
+    "translations:check": "node bin/translations.mjs check",
+    "translations:add": "node bin/translations.mjs add",
+    "translations:sync": "node bin/translations.mjs sync",
+    "translations:status": "node bin/translations.mjs status",
+    "test:i18n": "node --test tests/Unit/i18n.test.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

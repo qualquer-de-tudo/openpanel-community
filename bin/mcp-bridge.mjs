@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import readline from "node:readline";
+import { t, languageTag } from "./locale.mjs";
 
 let configuration;
 try {
@@ -32,7 +33,9 @@ try {
         throw new Error();
 } catch {
     process.stderr.write(
-        "QOpenPanel: configuração privada inválida ou permissões insuficientes.\n",
+        t(
+            "QOpenPanel: configuração privada inválida ou permissões insuficientes.",
+        ) + "\n",
     );
     process.exit(1);
 }
@@ -56,6 +59,7 @@ for await (const line of input) {
         const headers = {
             "Content-Type": "application/json",
             Accept: "application/json, text/event-stream",
+            "Accept-Language": languageTag,
             Authorization: `Bearer ${configuration.token}`,
             "MCP-Protocol-Version": protocol,
             "Mcp-Method": message.method,
@@ -82,14 +86,15 @@ for await (const line of input) {
                     id: message.id,
                     error: {
                         code: -32603,
-                        message:
+                        message: t(
                             "QOpenPanel: operação recusada, acesso expirado ou servidor indisponível.",
+                        ),
                     },
                 }) + "\n",
             );
         else
             process.stderr.write(
-                "QOpenPanel: mensagem inválida ou operação recusada.\n",
+                t("QOpenPanel: mensagem inválida ou operação recusada.") + "\n",
             );
     }
 }

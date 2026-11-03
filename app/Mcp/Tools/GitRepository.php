@@ -78,6 +78,6 @@ class GitRepository extends PanelTool
 
     public function schema(JsonSchema $schema): array
     {
-        return ['action' => $schema->string()->enum(['branches', 'commits', 'tree', 'create_branch', 'create_tag', 'commit_file'])->required(), 'resource_id' => $schema->integer()->min(1)->required(), 'reference' => $schema->string()->required()->description('UUID of a GitHub credential imported by the operator, scoped to this exact repository.'), 'branch' => $schema->string(), 'name' => $schema->string(), 'source_sha' => $schema->string(), 'expected_head_sha' => $schema->string(), 'path' => $schema->string(), 'content' => $schema->string()->description('New source file contents; never include secrets.')];
+        return ['action' => $schema->string()->enum(['branches', 'commits', 'tree', 'create_branch', 'create_tag', 'commit_file'])->required(), 'resource_id' => $schema->integer()->min(1)->required(), 'reference' => $schema->string()->required()->description(__('UUID of a GitHub credential imported by the operator, scoped to this exact repository.')), 'branch' => $schema->string(), 'name' => $schema->string(), 'source_sha' => $schema->string(), 'expected_head_sha' => $schema->string(), 'path' => $schema->string(), 'content' => $schema->string()->description(__('New source file contents; never include secrets.'))];
     }
 }

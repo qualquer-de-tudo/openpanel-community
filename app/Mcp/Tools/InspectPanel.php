@@ -29,6 +29,6 @@ class InspectPanel extends PanelTool
 
     public function schema(JsonSchema $schema): array
     {
-        return ['after_id' => $schema->integer()->min(0)->description('Pagination cursor; omit for first page.')];
+        return ['after_id' => $schema->integer()->min(0)->description(__('Pagination cursor; omit for first page.'))];
     }
 }

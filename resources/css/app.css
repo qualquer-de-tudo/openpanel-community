@@ -1461,3 +1461,133 @@ label > small {
         font-size: 9px;
     }
 }
+
+.language-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 10px;
+    color: #7c9083;
+    min-width: 0;
+}
+.language-selector > span {
+    white-space: nowrap;
+}
+.language-selector select {
+    margin: 0;
+    padding: 7px 26px 7px 9px;
+    font-size: 11px;
+    width: auto;
+    max-width: 160px;
+    background: #fff;
+    border-color: #e0e8e1;
+}
+.auth-form > .language-selector {
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+.install-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 9px 13px;
+    border-radius: 7px;
+    background: #218767;
+    color: #fff;
+}
+.header-right {
+    gap: 14px;
+}
+.nav-caption {
+    letter-spacing: 1px;
+}
+.page-heading h1 {
+    overflow-wrap: anywhere;
+}
+.empty h3 {
+    line-height: 1.6;
+}
+html:lang(zh-CN),
+html:lang(ja) {
+    font-family:
+        "DM Sans", "Noto Sans CJK SC", "Yu Gothic", "Microsoft YaHei",
+        sans-serif;
+}
+html:lang(zh-CN) .eyebrow,
+html:lang(ja) .eyebrow {
+    letter-spacing: 0.8px;
+}
+html:lang(fr) nav button,
+html:lang(es) nav button {
+    font-size: 10.5px;
+}
+@media (max-width: 950px) {
+    .connection {
+        display: none;
+    }
+    .language-selector > span {
+        display: none;
+    }
+    .header-right {
+        gap: 8px;
+    }
+    .separator {
+        display: none;
+    }
+}
+@media (max-width: 700px) {
+    .language-selector select {
+        max-width: 112px;
+        font-size: 10px;
+        padding: 7px 5px;
+    }
+    .install-button {
+        font-size: 10px;
+        padding: 8px 10px;
+    }
+    .header-right .avatar {
+        display: none;
+    }
+    .breadcrumb {
+        max-width: 130px;
+    }
+    .breadcrumb strong {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .page-heading h1 {
+        font-size: 24px;
+    }
+    .hero h2 {
+        font-size: 23px;
+    }
+    .hero-content {
+        width: 95%;
+    }
+    .hero-label {
+        font-size: 7px;
+    }
+    .sidebar.mobile nav button {
+        font-size: 10.5px;
+    }
+}
+
+.sidebar nav {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+.sidebar-foot {
+    flex-shrink: 0;
+}
+@media (max-width: 700px) {
+    header .breadcrumb {
+        display: none;
+    }
+}

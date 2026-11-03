@@ -37,6 +37,6 @@ class ManageVault extends PanelTool
 
     public function schema(JsonSchema $schema): array
     {
-        return ['action' => $schema->string()->enum(['list', 'generate', 'rotate', 'bind', 'unbind'])->required(), 'resource_id' => $schema->integer()->min(1)->required(), 'reference' => $schema->string()->description('Opaque secret UUID, never a secret value.'), 'variable' => $schema->string()->description('Environment variable name, e.g. DB_PASSWORD.')];
+        return ['action' => $schema->string()->enum(['list', 'generate', 'rotate', 'bind', 'unbind'])->required(), 'resource_id' => $schema->integer()->min(1)->required(), 'reference' => $schema->string()->description(__('Opaque secret UUID, never a secret value.')), 'variable' => $schema->string()->description(__('Environment variable name, e.g. DB_PASSWORD.'))];
     }
 }

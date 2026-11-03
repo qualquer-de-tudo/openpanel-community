@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { Panel } from "./app.jsx";
 import catalog from "../data/catalog.json";
+import { I18nProvider } from "./i18n.jsx";
 const resources = [
     {
         id: 1,
@@ -78,6 +79,10 @@ createInertiaApp({
     },
     resolve: () => Panel,
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <I18nProvider>
+                <App {...props} />
+            </I18nProvider>,
+        );
     },
 });

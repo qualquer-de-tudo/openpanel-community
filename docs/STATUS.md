@@ -24,3 +24,7 @@ Próximos marcos: agente Linux autenticado e auditável; receitas versionadas e 
 ## MCP (incremento da versão 0.2)
 
 Endpoint autenticado, permissões por conta/recurso, cofre criptografado sem retorno de valores, auditoria, versões de configuração, planos presos a commit e broker GitHub. Veja [MCP.md](MCP.md). Execução Linux, OAuth interativo e deploy efetivo continuam pendentes.
+
+## Beta 0.3.0-beta.1
+
+Botão de instalação na demo, seis idiomas iniciais e catálogos compartilhados React/Laravel. Traduções verificadas no CI. A classificação beta se refere à experiência do painel; o executor Linux e os deploys efetivos continuam pendentes.

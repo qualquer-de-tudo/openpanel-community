@@ -66,7 +66,7 @@ class PanelAutomation
         if (! empty($data['repository'])) {
             $parts = parse_url($data['repository']);
             if (isset($parts['user']) || isset($parts['pass']) || isset($parts['query']) || isset($parts['fragment'])) {
-                throw ValidationException::withMessages(['repository' => 'Use a URL pública do repositório, sem credenciais ou parâmetros.']);
+                throw ValidationException::withMessages(['repository' => __('Use a URL pública do repositório, sem credenciais ou parâmetros.')]);
             }
         }
 
@@ -92,13 +92,13 @@ class PanelAutomation
             $data = $this->validateConfiguration($input, $resource);
             $all = Resource::where('user_id', Auth::id())->when($id, fn ($q) => $q->where('id', '!=', $id));
             if ((clone $all)->sum('disk_mb') + $data['disk_mb'] > $account->disk_mb) {
-                throw ValidationException::withMessages(['disk_mb' => 'A reserva ultrapassa o espaço disponível da conta.']);
+                throw ValidationException::withMessages(['disk_mb' => __('A reserva ultrapassa o espaço disponível da conta.')]);
             }
             $limit = match ($data['kind']) {
                 'sites' => $account->project_limit,'databases' => $account->database_limit,default => 100
             };
             if ((clone $all)->where('kind', $data['kind'])->count() >= $limit) {
-                throw ValidationException::withMessages(['name' => 'Limite da conta atingido.']);
+                throw ValidationException::withMessages(['name' => __('Limite da conta atingido.')]);
             }
             if ($resource) {
                 $resource->fill([...$data, 'revision' => $resource->revision + 1])->save();

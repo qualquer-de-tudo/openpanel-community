@@ -15,6 +15,11 @@ use Illuminate\Support\Str;
 #[Description('Create a scoped, expiring MCP grant in a private file; never print the credential')]
 class McpGrant extends Command
 {
+    public function getDescription(): string
+    {
+        return __(parent::getDescription());
+    }
+
     /**
      * Execute the console command.
      */
@@ -26,7 +31,7 @@ class McpGrant extends Command
         $endpoint = $this->option('endpoint');
         $url = parse_url($endpoint);
         if (! $user || ! $days || array_diff($scopes, PanelAutomation::SCOPES) || ! $url || empty($url['host']) || isset($url['user']) || isset($url['pass']) || isset($url['query']) || isset($url['fragment']) || ($url['path'] ?? '') !== '/mcp/panel' || (($url['scheme'] ?? '') !== 'https' && ! (($url['scheme'] ?? '') === 'http' && in_array($url['host'] ?? '', ['127.0.0.1', 'localhost', '::1'], true)))) {
-            $this->error('Conta, permissões, endpoint ou validade inválidos.');
+            $this->error(__('Conta, permissões, endpoint ou validade inválidos.'));
 
             return self::FAILURE;
         }
@@ -35,14 +40,14 @@ class McpGrant extends Command
             $raw = explode(',', $this->option('projects'));
             foreach ($raw as $id) {
                 if (! ctype_digit($id) || ((int) $id) < 1) {
-                    $this->error('IDs de projetos inválidos.');
+                    $this->error(__('IDs de projetos inválidos.'));
 
                     return self::FAILURE;
                 }
             }
             $ids = array_values(array_unique(array_map('intval', $raw)));
             if (\App\Models\Resource::where('user_id', $user->id)->whereIn('id', $ids)->count() !== count($ids)) {
-                $this->error('Projetos não disponíveis para esta conta.');
+                $this->error(__('Projetos não disponíveis para esta conta.'));
 
                 return self::FAILURE;
             }
@@ -56,12 +61,12 @@ class McpGrant extends Command
             PrivateFile::write($this->argument('output'), $json);
         } catch (\Throwable) {
             DB::table('mcp_grants')->where('id', $id)->delete();
-            $this->error('Não foi possível salvar a concessão. Nenhuma credencial foi exibida.');
+            $this->error(__('Não foi possível salvar a concessão. Nenhuma credencial foi exibida.'));
 
             return self::FAILURE;
         }
-        $this->info('Acesso criado. ID para revogação: '.$id);
-        $this->line('Credencial gravada no arquivo privado; não cole seu conteúdo em chats.');
+        $this->info(__('Acesso criado. ID para revogação: :id', ['id' => $id]));
+        $this->line(__('Credencial gravada no arquivo privado; não cole seu conteúdo em chats.'));
 
         return self::SUCCESS;
     }

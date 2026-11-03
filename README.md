@@ -4,9 +4,13 @@
 
 [Demo interativa](https://qualquer-de-tudo.github.io/qopenpanel-community/) · [Instalar em uma VPS](docs/INSTALL.md) · [AWS, Azure e outros provedores](docs/PROVIDERS.md) · [Contribuir](CONTRIBUTING.md) · [MCP para IAs](docs/MCP.md)
 
-> **Versão 0.1 — MVP de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
+> **Versão 0.3.0-beta.1 — beta de planejamento.** Login, contas isoladas, cotas e cadastro de configurações funcionam. Instalação de serviços, deploys, SSL dos sites, e-mail, WAF e limites reais de hardware ainda dependem do futuro agente Linux. Consulte [o escopo](docs/STATUS.md).
 
 ![Dashboard de demonstração do OpenPanel](docs/demo-preview.png)
+
+## Idiomas
+
+Português, English, Français, Español, 简体中文 e 日本語, com seletor e preferência persistida. [Como traduzir ou adicionar um idioma](docs/TRANSLATING.md).
 
 ## Demonstração gratuita
 

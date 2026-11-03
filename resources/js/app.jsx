@@ -37,6 +37,8 @@ import {
     GitBranch,
 } from "lucide-react";
 import "../css/app.css";
+import { I18nProvider, LanguageSelector, useI18n } from "./i18n.jsx";
+import release from "../data/release.json";
 const nav = [
     ["overview", "Visão geral", LayoutDashboard],
     ["sites", "Sites e projetos", Globe],
@@ -66,6 +68,7 @@ const descriptions = {
     marketplace: "Uma nova possibilidade para o seu servidor.",
 };
 function Login({ setup }) {
+    const { t } = useI18n();
     const f = useForm({
         name: "",
         email: "",
@@ -77,19 +80,19 @@ function Login({ setup }) {
             <div className="auth-art">
                 <Brand />
                 <span className="eyebrow">
-                    SEU SERVIDOR. SUAS POSSIBILIDADES.
+                    {" "}
+                    {t("SEU SERVIDOR. SUAS POSSIBILIDADES.")}{" "}
                 </span>
                 <h1>
-                    Uma casa para
-                    <br />
-                    todas as suas
-                    <br />
-                    <em>ideias.</em>
+                    {" "}
+                    {t("Uma casa para")} <br /> {t("todas as suas")} <br />
+                    <em>{t("ideias.")}</em>
                 </h1>
                 <p>
-                    Do primeiro deploy ao próximo grande projeto.
-                    <br />
-                    Tudo sob seu controle, em um só lugar.
+                    {" "}
+                    {t(
+                        "Do primeiro deploy ao próximo grande projeto.",
+                    )} <br /> {t("Tudo sob seu controle, em um só lugar.")}{" "}
                 </p>
                 <div className="auth-grid">
                     {[Globe, Database, Box, ShieldCheck].map((I, i) => (
@@ -98,23 +101,36 @@ function Login({ setup }) {
                         </div>
                     ))}
                 </div>
-                <small>OpenPanel · Infraestrutura com simplicidade</small>
+                <small>
+                    {t("OpenPanel · Infraestrutura com simplicidade")}
+                </small>
             </div>
             <div className="auth-form">
+                <LanguageSelector />
                 <span className="badge">
-                    {setup ? "PRIMEIRO ACESSO" : "BEM-VINDO DE VOLTA"}
+                    {setup ? t("PRIMEIRO ACESSO") : t("BEM-VINDO DE VOLTA")}
                 </span>
                 <h2>
                     {setup
-                        ? "Seu painel começa aqui."
-                        : "Bom ter você por aqui."}
+                        ? t("Seu painel começa aqui.")
+                        : t("Bom ter você por aqui.")}
                 </h2>
                 <p>
                     {setup
-                        ? "Crie a conta administradora para começar a organizar seu servidor."
-                        : "Entre para cuidar dos seus projetos."}
+                        ? t(
+                              "Crie a conta administradora para começar a organizar seu servidor.",
+                          )
+                        : t("Entre para cuidar dos seus projetos.")}
                 </p>
                 <form
+                    onInvalidCapture={(event) =>
+                        event.target.setCustomValidity(
+                            t("Verifique este campo."),
+                        )
+                    }
+                    onInputCapture={(event) =>
+                        event.target.setCustomValidity("")
+                    }
                     onSubmit={(e) => {
                         e.preventDefault();
                         f.post(setup ? "/setup" : "/login");
@@ -127,10 +143,11 @@ function Login({ setup }) {
                         <label key={k}>
                             {
                                 {
-                                    name: "Seu nome",
-                                    email: "E-mail",
-                                    password: "Senha",
-                                    password_confirmation: "Confirme a senha",
+                                    name: t("Seu nome"),
+                                    email: t("E-mail"),
+                                    password: t("Senha"),
+                                    password_confirmation:
+                                        t("Confirme a senha"),
                                 }[k]
                             }
                             <input
@@ -163,12 +180,15 @@ function Login({ setup }) {
                         </label>
                     ))}
                     <button className="primary" disabled={f.processing}>
-                        {setup ? "Criar meu painel" : "Entrar no painel"}
+                        {setup ? t("Criar meu painel") : t("Entrar no painel")}
                         <ArrowUpRight size={17} />
                     </button>
                 </form>
                 <small>
-                    Conexão local por IP ou domínio configurado no servidor.
+                    {" "}
+                    {t(
+                        "Conexão local por IP ou domínio configurado no servidor.",
+                    )}{" "}
                 </small>
             </div>
         </div>
@@ -192,13 +212,15 @@ export function Panel({
     user,
     server,
     message,
+    messageKey,
     demo = false,
 }) {
+    const { t, number } = useI18n();
     const [page, setPage] = useState("overview"),
         [search, setSearch] = useState(""),
         [modal, setModal] = useState(null),
         [mobile, setMobile] = useState(false),
-        [filter, setFilter] = useState("Todos");
+        [filter, setFilter] = useState("all");
     const f = useForm({
         kind: "sites",
         name: "",
@@ -210,7 +232,9 @@ export function Panel({
     const removeResource = (url) => {
         if (demo) {
             window.alert(
-                "Demonstração: alterações não são enviadas a nenhum servidor.",
+                t(
+                    "Demonstração: alterações não são enviadas a nenhum servidor.",
+                ),
             );
             return;
         }
@@ -242,7 +266,7 @@ export function Panel({
             (page === "docker"
                 ? r.engine === "Docker Compose"
                 : r.kind === kind) &&
-            `${r.name} ${r.engine} ${r.domain || ""}`
+            `${r.name} ${t(r.engine)} ${r.domain || ""}`
                 .toLowerCase()
                 .includes(search.toLowerCase()),
     );
@@ -253,22 +277,26 @@ export function Panel({
                 <div className="workspace">
                     <span className="workspace-icon">O</span>
                     <div>
-                        Meu workspace<small>Workspace isolado</small>
+                        {" "}
+                        {t("Meu workspace")}
+                        <small>{t("Workspace isolado")}</small>
                     </div>
                     <ChevronDown size={15} />
                 </div>
-                <span className="nav-caption">WORKSPACE</span>
+                <span className="nav-caption">{t("WORKSPACE")}</span>
                 <nav>
                     {nav.map(([id, label, I], i) => (
                         <React.Fragment key={id}>
                             {i === 5 && (
                                 <span className="nav-caption spaced">
-                                    INFRAESTRUTURA
+                                    {" "}
+                                    {t("INFRAESTRUTURA")}{" "}
                                 </span>
                             )}
                             {i === 10 && (
                                 <span className="nav-caption spaced">
-                                    GERENCIAMENTO
+                                    {" "}
+                                    {t("GERENCIAMENTO")}{" "}
                                 </span>
                             )}
                             <button
@@ -276,14 +304,14 @@ export function Panel({
                                 className={page === id ? "active" : ""}
                             >
                                 <I size={18} />
-                                {label}
+                                {t(label)}
                                 {id === "sites" && (
                                     <span className="count">
                                         {projects.length}
                                     </span>
                                 )}
                                 {id === "marketplace" && (
-                                    <span className="new">novo</span>
+                                    <span className="new">{t("novo")}</span>
                                 )}
                             </button>
                         </React.Fragment>
@@ -293,8 +321,13 @@ export function Panel({
                     <div className="help">
                         <BookOpen size={18} />
                         <div>
-                            Construído para você
-                            <small>Community edition · v0.1</small>
+                            {" "}
+                            {t("Construído para você")}{" "}
+                            <small>
+                                {t("Edição comunitária · :version", {
+                                    version: release.version,
+                                })}
+                            </small>
                         </div>
                     </div>
                     <button
@@ -302,18 +335,20 @@ export function Panel({
                         onClick={() =>
                             demo
                                 ? window.alert(
-                                      "Você está navegando em uma demonstração pública, sem sessão administrativa.",
+                                      t(
+                                          "Você está navegando em uma demonstração pública, sem sessão administrativa.",
+                                      ),
                                   )
                                 : router.post("/logout")
                         }
-                        title="Sair"
+                        title={t("Sair")}
                     >
                         <span className="avatar">
                             {user.name.slice(0, 2).toUpperCase()}
                         </span>
                         <div>
-                            {user.name}
-                            <small>Titular da conta</small>
+                            {demo ? t("Visitante") : user.name}
+                            <small>{t("Titular da conta")}</small>
                         </div>
                         <LogOut size={16} />
                     </button>
@@ -323,17 +358,34 @@ export function Panel({
                 <header>
                     <button
                         className="icon mobile-toggle"
+                        aria-label={t("Abrir navegação")}
                         onClick={() => setMobile(!mobile)}
                     >
                         <Menu size={20} />
                     </button>
                     <div className="breadcrumb">
-                        Workspace <ChevronRight size={13} />{" "}
-                        <strong>{nav.find((n) => n[0] === page)?.[1]}</strong>
+                        {" "}
+                        {t("Workspace")} <ChevronRight size={13} />{" "}
+                        <strong>
+                            {t(nav.find((n) => n[0] === page)?.[1])}
+                        </strong>
                     </div>
                     <div className="header-right">
+                        <LanguageSelector />
+                        {demo && (
+                            <a
+                                className="primary install-button"
+                                href="https://github.com/qualquer-de-tudo/qopenpanel-community"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={t("Instalar o OpenPanel pelo GitHub")}
+                            >
+                                <Download size={16} />
+                                {t("Instalar")}
+                            </a>
+                        )}
                         <span className="connection">
-                            <i /> Painel conectado
+                            <i /> {t("Painel conectado")}{" "}
                         </span>
                         <span className="separator" />
                         <span className="avatar tiny">
@@ -345,19 +397,29 @@ export function Panel({
                     <div className="page-heading">
                         <div>
                             <span className="eyebrow">
-                                SEU SERVIDOR, SIMPLIFICADO
+                                {" "}
+                                {t("SEU SERVIDOR, SIMPLIFICADO")}{" "}
                             </span>
                             <h1>
                                 {page === "overview"
-                                    ? "Visão geral"
-                                    : nav.find((n) => n[0] === page)?.[1]}
+                                    ? t("Visão geral")
+                                    : t(nav.find((n) => n[0] === page)?.[1])}
                                 <span className="heading-dot">.</span>
                             </h1>
                             <p>
                                 {page === "overview"
-                                    ? `Olá, ${user.name.split(" ")[0]}. Vamos dar vida ao seu próximo projeto?`
-                                    : descriptions[page] ||
-                                      "Recursos organizados para cada conta."}
+                                    ? t(
+                                          "Olá, :name. Vamos dar vida ao seu próximo projeto?",
+                                          {
+                                              name: demo
+                                                  ? t("Visitante")
+                                                  : user.name.split(" ")[0],
+                                          },
+                                      )
+                                    : t(descriptions[page]) ||
+                                      t(
+                                          "Recursos organizados para cada conta.",
+                                      )}
                             </p>
                         </div>
                         <button
@@ -375,24 +437,25 @@ export function Panel({
                         >
                             <Plus size={17} />
                             {page === "overview"
-                                ? "Novo projeto"
-                                : "Nova configuração"}
+                                ? t("Novo projeto")
+                                : t("Nova configuração")}
                         </button>
                     </div>
                     {demo && (
                         <div className="notice">
                             <BookOpen size={18} />
                             <span>
-                                <strong>Demonstração pública</strong> · Dados
-                                fictícios e navegação em modo leitura. Nenhuma
-                                operação é executada em servidores.
+                                <strong>{t("Demonstração pública")}</strong>{" "}
+                                {t(
+                                    "· Dados fictícios e navegação em modo leitura. Nenhuma operação é executada em servidores.",
+                                )}{" "}
                             </span>
                         </div>
                     )}
                     {message && (
                         <div className="notice success">
                             <Check size={17} />
-                            {message}
+                            {t(messageKey || message)}
                         </div>
                     )}
                     {page === "overview" ? (
@@ -400,21 +463,29 @@ export function Panel({
                             <div className="hero">
                                 <div className="hero-content">
                                     <span className="hero-label">
-                                        <span /> SEU PRÓXIMO DEPLOY COMEÇA AQUI
+                                        <span />{" "}
+                                        {t(
+                                            "SEU PRÓXIMO DEPLOY COMEÇA AQUI",
+                                        )}{" "}
                                     </span>
                                     <h2>
-                                        Menos complexidade.
-                                        <br />
-                                        Mais possibilidades.
+                                        {" "}
+                                        {t("Menos complexidade.")} <br />{" "}
+                                        {t("Mais possibilidades.")}{" "}
                                     </h2>
                                     <p>
-                                        Sites, containers e bancos de dados.
-                                        <br />
-                                        Sua infraestrutura inteira, no mesmo
-                                        lugar.
+                                        {" "}
+                                        {t(
+                                            "Sites, containers e bancos de dados.",
+                                        )}{" "}
+                                        <br />{" "}
+                                        {t(
+                                            "Sua infraestrutura inteira, no mesmo lugar.",
+                                        )}{" "}
                                     </p>
                                     <button onClick={() => open()}>
-                                        Criar meu primeiro projeto{" "}
+                                        {" "}
+                                        {t("Criar meu primeiro projeto")}{" "}
                                         <ArrowUpRight size={17} />
                                     </button>
                                 </div>
@@ -422,7 +493,8 @@ export function Panel({
                                     <div className="orbit orbit-one" />
                                     <div className="orbit orbit-two" />
                                     <div className="float-tag tag-top">
-                                        <Globe size={16} /> seus projetos.online
+                                        <Globe size={16} />{" "}
+                                        {t("seus projetos.online")}{" "}
                                     </div>
                                     <div className="server-stack">
                                         {[1, 2, 3].map((i) => (
@@ -438,8 +510,8 @@ export function Panel({
                                         ))}
                                     </div>
                                     <div className="float-tag tag-bottom">
-                                        <ShieldCheck size={16} /> Seu espaço
-                                        para construir
+                                        <ShieldCheck size={16} />{" "}
+                                        {t("Seu espaço para construir")}{" "}
                                     </div>
                                     <span className="spark s1">+</span>
                                     <span className="spark s2">+</span>
@@ -449,34 +521,46 @@ export function Panel({
                                 {[
                                     [
                                         Globe,
-                                        "Projetos",
+                                        t("Projetos"),
                                         projects.length,
-                                        `de ${account?.project_limit || 0} disponíveis`,
+                                        t("de :count disponíveis", {
+                                            count: number(
+                                                account?.project_limit || 0,
+                                            ),
+                                        }),
                                     ],
                                     [
                                         Database,
-                                        "Bancos de dados",
+                                        t("Bancos de dados"),
                                         resources.filter(
                                             (r) => r.kind === "databases",
                                         ).length,
-                                        `de ${account?.database_limit || 0} disponíveis`,
+                                        t("de :count disponíveis", {
+                                            count: number(
+                                                account?.database_limit || 0,
+                                            ),
+                                        }),
                                     ],
                                     [
                                         HardDrive,
-                                        "Espaço reservado",
-                                        `${(used / 1024).toFixed(1)} GB`,
-                                        `${(account?.disk_mb || 0) / 1024} GB no seu plano`,
+                                        t("Espaço reservado"),
+                                        `${number(used / 1024, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} GB`,
+                                        t(":amount GB no seu plano", {
+                                            amount: number(
+                                                (account?.disk_mb || 0) / 1024,
+                                            ),
+                                        }),
                                     ],
                                     [
                                         MemoryStick,
-                                        "Memória do plano",
-                                        `${(account?.memory_mb || 0) / 1024} GB`,
-                                        "Limite planejado por conta",
+                                        t("Memória do plano"),
+                                        `${number((account?.memory_mb || 0) / 1024)} GB`,
+                                        t("Limite planejado por conta"),
                                     ],
                                 ].map(([I, label, value, sub], i) => (
-                                    <div className="metric" key={label}>
+                                    <div className="metric" key={t(label)}>
                                         <div className="metric-label">
-                                            {label}
+                                            {t(label)}
                                             <I size={17} />
                                         </div>
                                         <strong>{value}</strong>
@@ -484,7 +568,8 @@ export function Panel({
                                             <span>{sub}</span>
                                             {i < 2 ? (
                                                 <span className="mini-tag">
-                                                    cota
+                                                    {" "}
+                                                    {t("cota")}{" "}
                                                 </span>
                                             ) : (
                                                 <div className="mini-track">
@@ -504,18 +589,23 @@ export function Panel({
                                     <div className="section-head">
                                         <div>
                                             <h3>
-                                                Seus projetos{" "}
+                                                {" "}
+                                                {t("Seus projetos")}{" "}
                                                 <span className="number">
                                                     {projects.length}
                                                 </span>
                                             </h3>
-                                            <p>Um lugar para cada ideia.</p>
+                                            <p>
+                                                {t("Um lugar para cada ideia.")}
+                                            </p>
                                         </div>
                                         <button
                                             className="text-button"
                                             onClick={() => go("sites")}
                                         >
-                                            Ver todos <ArrowUpRight size={15} />
+                                            {" "}
+                                            {t("Ver todos")}{" "}
+                                            <ArrowUpRight size={15} />
                                         </button>
                                     </div>
                                     {projects.length ? (
@@ -533,32 +623,40 @@ export function Panel({
                                                 <Globe size={26} />
                                             </div>
                                             <h3>
-                                                Grandes ideias começam com um
-                                                deploy.
+                                                {" "}
+                                                {t(
+                                                    "Grandes ideias começam com um deploy.",
+                                                )}{" "}
                                             </h3>
                                             <p>
-                                                Conecte seu repositório ou
-                                                escolha uma stack
-                                                <br />
-                                                para preparar seu primeiro
-                                                projeto.
+                                                {" "}
+                                                {t(
+                                                    "Conecte seu repositório ou escolha uma stack",
+                                                )}{" "}
+                                                <br />{" "}
+                                                {t(
+                                                    "para preparar seu primeiro projeto.",
+                                                )}{" "}
                                             </p>
                                             <button
                                                 className="secondary"
                                                 onClick={() => open()}
                                             >
-                                                <Plus size={16} /> Adicionar
-                                                projeto
+                                                <Plus size={16} />{" "}
+                                                {t("Adicionar projeto")}{" "}
                                             </button>
                                         </div>
                                     )}
                                     <div className="card-footer">
-                                        <GitBranch size={15} /> Seu código, seu
-                                        repositório, suas regras.
+                                        <GitBranch size={15} />{" "}
+                                        {t(
+                                            "Seu código, seu repositório, suas regras.",
+                                        )}{" "}
                                         <button
                                             onClick={() => go("integrations")}
                                         >
-                                            Conectar Git{" "}
+                                            {" "}
+                                            {t("Conectar Git")}{" "}
                                             <ArrowUpRight size={14} />
                                         </button>
                                     </div>
@@ -566,8 +664,12 @@ export function Panel({
                                 <section className="card server-info">
                                     <div className="section-head">
                                         <div>
-                                            <h3>Seu ambiente</h3>
-                                            <p>Informações desta instalação</p>
+                                            <h3>{t("Seu ambiente")}</h3>
+                                            <p>
+                                                {t(
+                                                    "Informações desta instalação",
+                                                )}
+                                            </p>
                                         </div>
                                         <span className="server-icon">
                                             <Server size={20} />
@@ -580,31 +682,35 @@ export function Panel({
                                         <div>
                                             <strong>{server.hostname}</strong>
                                             <small>
-                                                {server.platform} · PHP{" "}
+                                                {t(server.platform)} · PHP{" "}
                                                 {server.php}
                                             </small>
                                         </div>
                                     </div>
                                     <div className="detail-row">
-                                        <span>Agente Linux</span>
+                                        <span>{t("Agente Linux")}</span>
                                         <span className="status warning">
-                                            Não conectado
+                                            {" "}
+                                            {t("Não conectado")}{" "}
                                         </span>
                                     </div>
                                     <div className="detail-row">
-                                        <span>Monitoramento</span>
-                                        <strong>Aguardando agente</strong>
+                                        <span>{t("Monitoramento")}</span>
+                                        <strong>
+                                            {t("Aguardando agente")}
+                                        </strong>
                                     </div>
                                     <div className="detail-row">
-                                        <span>Provisionamento</span>
-                                        <strong>Planejamento</strong>
+                                        <span>{t("Provisionamento")}</span>
+                                        <strong>{t("Planejamento")}</strong>
                                     </div>
                                     <div className="agent-note">
                                         <Activity size={17} />
                                         <span>
-                                            Métricas reais de CPU, RAM e tráfego
-                                            estarão disponíveis ao conectar o
-                                            agente.
+                                            {" "}
+                                            {t(
+                                                "Métricas reais de CPU, RAM e tráfego estarão disponíveis ao conectar o agente.",
+                                            )}{" "}
                                         </span>
                                     </div>
                                 </section>
@@ -612,17 +718,20 @@ export function Panel({
                             <section className="quick-section">
                                 <div className="section-head">
                                     <div>
-                                        <h3>Sua stack, do seu jeito</h3>
+                                        <h3>{t("Sua stack, do seu jeito")}</h3>
                                         <p>
-                                            As ferramentas que você já conhece.
-                                            Juntas.
+                                            {" "}
+                                            {t(
+                                                "As ferramentas que você já conhece. Juntas.",
+                                            )}{" "}
                                         </p>
                                     </div>
                                     <button
                                         className="text-button"
                                         onClick={() => go("marketplace")}
                                     >
-                                        Explorar marketplace{" "}
+                                        {" "}
+                                        {t("Explorar marketplace")}{" "}
                                         <ArrowUpRight size={15} />
                                     </button>
                                 </div>
@@ -631,25 +740,25 @@ export function Panel({
                                         [
                                             "N",
                                             "Nginx",
-                                            "Servidor web",
+                                            t("Servidor web"),
                                             "services",
                                         ],
                                         [
                                             "P",
                                             "PostgreSQL",
-                                            "Banco de dados",
+                                            t("Banco de dados"),
                                             "databases",
                                         ],
                                         [
                                             "D",
                                             "Docker Compose",
-                                            "Containers",
+                                            t("Containers"),
                                             "sites",
                                         ],
                                         [
                                             "L",
                                             "Laravel",
-                                            "Framework PHP",
+                                            t("Framework PHP"),
                                             "sites",
                                         ],
                                     ].map(([letter, name, sub, k], i) => (
@@ -673,34 +782,40 @@ export function Panel({
                         </>
                     ) : page === "accounts" ? (
                         <section className="card account-card">
-                            <h3>Meu plano de hospedagem</h3>
+                            <h3>{t("Meu plano de hospedagem")}</h3>
                             <p>
-                                Dados isolados por conta. As cotas abaixo
-                                validam a reserva de recursos.
+                                {" "}
+                                {t(
+                                    "Dados isolados por conta. As cotas abaixo validam a reserva de recursos.",
+                                )}{" "}
                             </p>
                             <div className="plan-grid">
                                 {[
-                                    ["Projetos", account?.project_limit],
+                                    [t("Projetos"), account?.project_limit],
                                     [
-                                        "Bancos de dados",
+                                        t("Bancos de dados"),
                                         account?.database_limit,
                                     ],
-                                    ["Disco", `${account?.disk_mb / 1024} GB`],
                                     [
-                                        "Memória",
+                                        t("Disco"),
+                                        `${account?.disk_mb / 1024} GB`,
+                                    ],
+                                    [
+                                        t("Memória"),
                                         `${account?.memory_mb / 1024} GB`,
                                     ],
                                 ].map(([k, v]) => (
                                     <div key={k}>
-                                        <small>{k}</small>
+                                        <small>{t(k)}</small>
                                         <strong>{v}</strong>
                                     </div>
                                 ))}
                             </div>
                             <div className="notice">
-                                O isolamento de CPU, memória e disco no sistema
-                                operacional requer integração com o agente
-                                Linux.
+                                {" "}
+                                {t(
+                                    "O isolamento de CPU, memória e disco no sistema operacional requer integração com o agente Linux.",
+                                )}{" "}
                             </div>
                         </section>
                     ) : page === "marketplace" ? (
@@ -709,7 +824,7 @@ export function Panel({
                                 <div className="search">
                                     <Search size={17} />
                                     <input
-                                        placeholder="Buscar aplicativos…"
+                                        placeholder={t("Buscar aplicativos…")}
                                         value={search}
                                         onChange={(e) =>
                                             setSearch(e.target.value)
@@ -720,10 +835,14 @@ export function Panel({
                                     value={filter}
                                     onChange={(e) => setFilter(e.target.value)}
                                 >
-                                    <option>Todos</option>
+                                    <option value="all">{t("Todos")}</option>
                                     {Object.keys(catalog).map((k) => (
                                         <option key={k} value={k}>
-                                            {nav.find((n) => n[0] === k)?.[1]}
+                                            {t(
+                                                nav.find(
+                                                    (n) => n[0] === k,
+                                                )?.[1],
+                                            )}
                                         </option>
                                     ))}
                                 </select>
@@ -732,12 +851,12 @@ export function Panel({
                                 {Object.entries(catalog)
                                     .filter(
                                         ([k]) =>
-                                            filter === "Todos" || filter === k,
+                                            filter === "all" || filter === k,
                                     )
                                     .flatMap(([k, apps]) =>
                                         apps
                                             .filter((a) =>
-                                                a
+                                                t(a)
                                                     .toLowerCase()
                                                     .includes(
                                                         search.toLowerCase(),
@@ -752,18 +871,22 @@ export function Panel({
                                                         {a.slice(0, 1)}
                                                     </span>
                                                     <span className="badge">
-                                                        Receita planejada
+                                                        {" "}
+                                                        {t(
+                                                            "Receita planejada",
+                                                        )}{" "}
                                                     </span>
-                                                    <h3>{a}</h3>
+                                                    <h3>{t(a)}</h3>
                                                     <p>
-                                                        {
+                                                        {t(
                                                             nav.find(
                                                                 (n) =>
                                                                     n[0] === k,
-                                                            )?.[1]
-                                                        }{" "}
-                                                        · Configuração por
-                                                        workspace
+                                                            )?.[1],
+                                                        )}{" "}
+                                                        {t(
+                                                            "· Configuração por workspace",
+                                                        )}{" "}
                                                     </p>
                                                     <button
                                                         className="secondary"
@@ -771,7 +894,8 @@ export function Panel({
                                                             open(k, a)
                                                         }
                                                     >
-                                                        Configurar{" "}
+                                                        {" "}
+                                                        {t("Configurar")}{" "}
                                                         <Plus size={15} />
                                                     </button>
                                                 </article>
@@ -779,9 +903,10 @@ export function Panel({
                                     )}
                             </div>
                             <div className="notice">
-                                O catálogo apresenta opções de configuração.
-                                Compatibilidade e instalação serão verificadas
-                                pelo executor Linux.
+                                {" "}
+                                {t(
+                                    "O catálogo apresenta opções de configuração. Compatibilidade e instalação serão verificadas pelo executor Linux.",
+                                )}{" "}
                             </div>
                         </>
                     ) : (
@@ -789,17 +914,17 @@ export function Panel({
                             <div className="section-head">
                                 <div>
                                     <h3>
-                                        {nav.find((n) => n[0] === page)?.[1]}{" "}
+                                        {t(nav.find((n) => n[0] === page)?.[1])}{" "}
                                         <span className="number">
                                             {visible.length}
                                         </span>
                                     </h3>
-                                    <p>Configurações do seu workspace</p>
+                                    <p>{t("Configurações do seu workspace")}</p>
                                 </div>
                                 <div className="search">
                                     <Search size={16} />
                                     <input
-                                        placeholder="Buscar por nome…"
+                                        placeholder={t("Buscar por nome…")}
                                         value={search}
                                         onChange={(e) =>
                                             setSearch(e.target.value)
@@ -813,7 +938,9 @@ export function Panel({
                                     remove={(id) => {
                                         if (
                                             window.confirm(
-                                                "Remover esta configuração do painel?",
+                                                t(
+                                                    "Remover esta configuração do painel?",
+                                                ),
                                             )
                                         )
                                             removeResource(`/resources/${id}`);
@@ -826,13 +953,19 @@ export function Panel({
                                     </div>
                                     <h3>
                                         {search
-                                            ? "Nenhum resultado encontrado"
-                                            : "Seu espaço está pronto para começar."}
+                                            ? t("Nenhum resultado encontrado")
+                                            : t(
+                                                  "Seu espaço está pronto para começar.",
+                                              )}
                                     </h3>
                                     <p>
                                         {search
-                                            ? "Experimente buscar outro nome."
-                                            : "Adicione uma configuração para organizar seu servidor."}
+                                            ? t(
+                                                  "Experimente buscar outro nome.",
+                                              )
+                                            : t(
+                                                  "Adicione uma configuração para organizar seu servidor.",
+                                              )}
                                     </p>
                                     <button
                                         className="secondary"
@@ -845,14 +978,16 @@ export function Panel({
                                             )
                                         }
                                     >
-                                        <Plus size={16} /> Adicionar
-                                        configuração
+                                        <Plus size={16} />{" "}
+                                        {t("Adicionar configuração")}{" "}
                                     </button>
                                 </div>
                             )}
                             <div className="card-footer">
-                                <Activity size={15} /> Configurações planejadas
-                                · execução depende do agente Linux.
+                                <Activity size={15} />{" "}
+                                {t(
+                                    "Configurações planejadas · execução depende do agente Linux.",
+                                )}{" "}
                             </div>
                         </section>
                     )}
@@ -860,10 +995,12 @@ export function Panel({
                         <span>
                             <span className="footer-dot" /> OpenPanel Community
                         </span>
-                        <span>Feito para construir. Livre para crescer.</span>
+                        <span>
+                            {t("Feito para construir. Livre para crescer.")}
+                        </span>
                         <span>
                             Laravel + React + Inertia{" "}
-                            <span className="version">v0.1</span>
+                            <span className="version">{release.version}</span>
                         </span>
                     </footer>
                 </main>
@@ -880,26 +1017,37 @@ export function Panel({
                         <div className="section-head">
                             <div>
                                 <span className="eyebrow">
-                                    ADICIONAR AO WORKSPACE
+                                    {" "}
+                                    {t("ADICIONAR AO WORKSPACE")}{" "}
                                 </span>
                                 <h2 id="modal-title">
-                                    {nav.find((n) => n[0] === modal)?.[1]}
+                                    {t(nav.find((n) => n[0] === modal)?.[1])}
                                 </h2>
                             </div>
                             <button
                                 className="icon"
                                 onClick={() => setModal(null)}
-                                aria-label="Fechar"
+                                aria-label={t("Fechar")}
                             >
                                 <X size={22} />
                             </button>
                         </div>
                         <form
+                            onInvalidCapture={(event) =>
+                                event.target.setCustomValidity(
+                                    t("Verifique este campo."),
+                                )
+                            }
+                            onInputCapture={(event) =>
+                                event.target.setCustomValidity("")
+                            }
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 if (demo) {
                                     window.alert(
-                                        "Demonstração em modo leitura. Instale o painel para salvar configurações.",
+                                        t(
+                                            "Demonstração em modo leitura. Instale o painel para salvar configurações.",
+                                        ),
                                     );
                                     return;
                                 }
@@ -909,13 +1057,14 @@ export function Panel({
                             }}
                         >
                             <label>
-                                Nome
+                                {" "}
+                                {t("Nome")}{" "}
                                 <input
                                     autoFocus
                                     required
                                     pattern="[a-z0-9][a-z0-9._-]*"
                                     maxLength={63}
-                                    placeholder="meu-projeto"
+                                    placeholder={t("meu-projeto")}
                                     value={f.data.name}
                                     onChange={(e) =>
                                         f.setData("name", e.target.value)
@@ -925,7 +1074,8 @@ export function Panel({
                             </label>
                             <div className="form-row">
                                 <label>
-                                    Stack / aplicativo
+                                    {" "}
+                                    {t("Stack / aplicativo")}{" "}
                                     <select
                                         value={f.data.engine}
                                         onChange={(e) =>
@@ -933,7 +1083,9 @@ export function Panel({
                                         }
                                     >
                                         {catalog[modal].map((a) => (
-                                            <option key={a}>{a}</option>
+                                            <option key={a} value={a}>
+                                                {t(a)}
+                                            </option>
                                         ))}
                                     </select>
                                     <small className="error">
@@ -941,7 +1093,8 @@ export function Panel({
                                     </small>
                                 </label>
                                 <label>
-                                    Reserva de disco (MB)
+                                    {" "}
+                                    {t("Reserva de disco (MB)")}{" "}
                                     <input
                                         type="number"
                                         required
@@ -958,9 +1111,10 @@ export function Panel({
                                 </label>
                             </div>
                             <label>
-                                Domínio <small>opcional</small>
+                                {" "}
+                                {t("Domínio")} <small>{t("opcional")}</small>
                                 <input
-                                    placeholder="app.seudominio.com"
+                                    placeholder={t("app.seudominio.com")}
                                     maxLength={253}
                                     pattern="([a-zA-Z0-9][a-zA-Z0-9-]*\.)+[a-zA-Z]{2,63}"
                                     value={f.data.domain}
@@ -973,11 +1127,15 @@ export function Panel({
                                 </small>
                             </label>
                             <label>
-                                Repositório HTTPS <small>opcional</small>
+                                {" "}
+                                {t("Repositório HTTPS")}{" "}
+                                <small>{t("opcional")}</small>
                                 <input
                                     type="url"
                                     pattern="https://.*"
-                                    placeholder="https://github.com/voce/projeto"
+                                    placeholder={t(
+                                        "https://github.com/voce/projeto",
+                                    )}
                                     value={f.data.repository}
                                     onChange={(e) =>
                                         f.setData("repository", e.target.value)
@@ -990,9 +1148,10 @@ export function Panel({
                             <div className="notice">
                                 <Terminal size={18} />
                                 <span>
-                                    Esta ação salva o planejamento. Nenhum
-                                    serviço será instalado até a integração com
-                                    o agente Linux.
+                                    {" "}
+                                    {t(
+                                        "Esta ação salva o planejamento. Nenhum serviço será instalado até a integração com o agente Linux.",
+                                    )}{" "}
                                 </span>
                             </div>
                             <div className="modal-actions">
@@ -1001,7 +1160,8 @@ export function Panel({
                                     className="secondary"
                                     onClick={() => setModal(null)}
                                 >
-                                    Cancelar
+                                    {" "}
+                                    {t("Cancelar")}{" "}
                                 </button>
                                 <button
                                     className="primary"
@@ -1009,8 +1169,8 @@ export function Panel({
                                 >
                                     <Plus size={16} />
                                     {f.processing
-                                        ? "Salvando…"
-                                        : "Salvar configuração"}
+                                        ? t("Salvando…")
+                                        : t("Salvar configuração")}
                                 </button>
                             </div>
                         </form>
@@ -1021,15 +1181,16 @@ export function Panel({
     );
 }
 function ResourceTable({ rows, remove }) {
+    const { t, number } = useI18n();
     return (
         <div className="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>PROJETO / RECURSO</th>
-                        <th>STACK</th>
-                        <th>STATUS</th>
-                        <th>DISCO</th>
+                        <th>{t("PROJETO / RECURSO")}</th>
+                        <th>{t("STACK")}</th>
+                        <th>{t("STATUS")}</th>
+                        <th>{t("DISCO")}</th>
                         <th />
                     </tr>
                 </thead>
@@ -1039,22 +1200,27 @@ function ResourceTable({ rows, remove }) {
                             <td>
                                 <strong>{r.name}</strong>
                                 <small>
-                                    {r.domain || "Sem domínio configurado"}
+                                    {r.domain || t("Sem domínio configurado")}
                                 </small>
                             </td>
                             <td>
-                                <span className="stack-label">{r.engine}</span>
+                                <span className="stack-label">
+                                    {t(r.engine)}
+                                </span>
                             </td>
                             <td>
                                 <span className="status warning">
-                                    Planejado
+                                    {" "}
+                                    {t("Planejado")}{" "}
                                 </span>
                             </td>
-                            <td>{r.disk_mb} MB</td>
+                            <td>{number(r.disk_mb)} MB</td>
                             <td>
                                 <button
                                     className="icon delete"
-                                    aria-label={`Remover ${r.name}`}
+                                    aria-label={t("Remover :name", {
+                                        name: r.name,
+                                    })}
                                     onClick={() => remove(r.id)}
                                 >
                                     <Trash2 size={16} />
@@ -1071,7 +1237,11 @@ if (document.getElementById("app")?.hasAttribute("data-page"))
     createInertiaApp({
         resolve: (name) => ({ Panel, Login })[name],
         setup({ el, App, props }) {
-            createRoot(el).render(<App {...props} />);
+            createRoot(el).render(
+                <I18nProvider initialLocale={props.initialPage.props.locale}>
+                    <App {...props} />
+                </I18nProvider>,
+            );
         },
         progress: { color: "#25896d" },
     });

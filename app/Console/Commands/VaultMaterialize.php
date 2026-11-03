@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Auth;
 #[Description('Human-only materialization of application environment into a private runtime file; never stdout')]
 class VaultMaterialize extends Command
 {
+    public function getDescription(): string
+    {
+        return __(parent::getDescription());
+    }
+
     /**
      * Execute the console command.
      */
@@ -22,7 +27,7 @@ class VaultMaterialize extends Command
     {
         $user = User::where('email', $this->argument('email'))->first();
         if (! $user) {
-            $this->error('Conta inválida.');
+            $this->error(__('Conta inválida.'));
 
             return self::FAILURE;
         }Auth::setUser($user);
@@ -30,11 +35,11 @@ class VaultMaterialize extends Command
             $content = app(BlindVault::class)->environment((int) $this->argument('resource'));
             PrivateFile::write($this->argument('output'), $content);
             app(PanelAutomation::class)->audit('human_secret_materialize', 'success');
-            $this->info('Ambiente gravado no arquivo privado. Nenhum valor foi exibido.');
+            $this->info(__('Ambiente gravado no arquivo privado. Nenhum valor foi exibido.'));
 
             return self::SUCCESS;
         } catch (\Throwable) {
-            $this->error('Exportação recusada. Nenhum valor foi exibido.');
+            $this->error(__('Exportação recusada. Nenhum valor foi exibido.'));
 
             return self::FAILURE;
         }

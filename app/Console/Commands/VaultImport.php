@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Auth;
 #[Description('Import a provider-issued GitHub token without displaying it, pinned to one resource and repository')]
 class VaultImport extends Command
 {
+    public function getDescription(): string
+    {
+        return __(parent::getDescription());
+    }
+
     /**
      * Execute the console command.
      */
@@ -22,13 +27,13 @@ class VaultImport extends Command
         $user = User::where('email', $this->argument('email'))->first();
         $path = $this->argument('file');
         if (! $user || ! is_file($path) || is_link($path) || filesize($path) > 4096 || (PHP_OS_FAMILY !== 'Windows' && (fileperms($path) & 0077) !== 0)) {
-            $this->error('Conta ou arquivo privado inválido. No Linux use chmod 600.');
+            $this->error(__('Conta ou arquivo privado inválido. No Linux use chmod 600.'));
 
             return self::FAILURE;
         }
         $value = trim(file_get_contents($path));
         if (! preg_match('/^[A-Za-z0-9_]{20,255}$/D', $value)) {
-            $this->error('Formato de token inválido.');
+            $this->error(__('Formato de token inválido.'));
 
             return self::FAILURE;
         }
@@ -36,11 +41,11 @@ class VaultImport extends Command
         try {
             $metadata = app(BlindVault::class)->importGithub((int) $this->argument('resource'), $value);
             app(PanelAutomation::class)->audit('human_github_import', 'success');
-            $this->info('Credencial importada. Referência: '.$metadata['reference']);
+            $this->info(__('Credencial importada. Referência: :reference', ['reference' => $metadata['reference']]));
 
             return self::SUCCESS;
         } catch (\Throwable) {
-            $this->error('Importação recusada. Nenhuma credencial foi exibida.');
+            $this->error(__('Importação recusada. Nenhuma credencial foi exibida.'));
 
             return self::FAILURE;
         }

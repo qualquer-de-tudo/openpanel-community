@@ -41,7 +41,7 @@ class PanelController extends Controller
     {
         $data = $r->validate(['email' => 'required|email', 'password' => 'required|string']);
         if (! Auth::attempt($data)) {
-            throw ValidationException::withMessages(['email' => 'E-mail ou senha incorretos.']);
+            throw ValidationException::withMessages(['email' => __('E-mail ou senha incorretos.')]);
         }
         $r->session()->regenerate();
 
@@ -59,14 +59,14 @@ class PanelController extends Controller
 
     public function index(Request $r)
     {
-        return Inertia::render('Panel', ['resources' => Resource::where('user_id', $r->user()->id)->latest()->get(), 'account' => DB::table('accounts')->where('user_id', $r->user()->id)->first(), 'catalog' => config('catalog'), 'user' => $r->user()->only('name', 'email'), 'message' => session('message'), 'server' => ['hostname' => gethostname(), 'platform' => PHP_OS_FAMILY, 'php' => PHP_VERSION, 'agent' => false]]);
+        return Inertia::render('Panel', ['resources' => Resource::where('user_id', $r->user()->id)->latest()->get(), 'account' => DB::table('accounts')->where('user_id', $r->user()->id)->first(), 'catalog' => config('catalog'), 'user' => $r->user()->only('name', 'email'), 'message' => session('message'), 'messageKey' => session('message_key'), 'server' => ['hostname' => gethostname(), 'platform' => PHP_OS_FAMILY, 'php' => PHP_VERSION, 'agent' => false]]);
     }
 
     public function store(Request $r)
     {
         app(PanelAutomation::class)->save($r->all());
 
-        return back()->with('message', 'Configuração salva. Execução no Linux aguarda a integração do agente.');
+        return back()->with('message', __('Configuração salva. Execução no Linux aguarda a integração do agente.'))->with('message_key', 'Configuração salva. Execução no Linux aguarda a integração do agente.');
     }
 
     public function destroy(Request $r, Resource $resource)
@@ -74,6 +74,6 @@ class PanelController extends Controller
         abort_unless($resource->user_id === $r->user()->id, 404);
         app(PanelAutomation::class)->remove($resource->id, $resource->revision);
 
-        return back()->with('message', 'Configuração removida.');
+        return back()->with('message', __('Configuração removida.'))->with('message_key', 'Configuração removida.');
     }
 }

@@ -12,18 +12,23 @@ use Illuminate\Support\Str;
 #[Description('Immediately revoke a panel MCP grant')]
 class McpRevoke extends Command
 {
+    public function getDescription(): string
+    {
+        return __(parent::getDescription());
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
         if (! Str::isUuid($this->argument('grant'))) {
-            $this->error('ID inválido.');
+            $this->error(__('ID inválido.'));
 
             return self::FAILURE;
         }
         $updated = DB::table('mcp_grants')->where('id', $this->argument('grant'))->whereNull('revoked_at')->update(['revoked_at' => now(), 'updated_at' => now()]);
-        $this->info($updated ? 'Acesso revogado.' : 'Acesso inexistente ou já revogado.');
+        $this->info($updated ? __('Acesso revogado.') : __('Acesso inexistente ou já revogado.'));
 
         return self::SUCCESS;
     }

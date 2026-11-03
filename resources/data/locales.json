@@ -1,0 +1,13 @@
+[
+    {
+        "code": "pt_BR",
+        "name": "Português",
+        "tag": "pt-BR",
+        "direction": "ltr"
+    },
+    { "code": "en", "name": "English", "tag": "en", "direction": "ltr" },
+    { "code": "fr", "name": "Français", "tag": "fr", "direction": "ltr" },
+    { "code": "es", "name": "Español", "tag": "es", "direction": "ltr" },
+    { "code": "zh_CN", "name": "简体中文", "tag": "zh-CN", "direction": "ltr" },
+    { "code": "ja", "name": "日本語", "tag": "ja", "direction": "ltr" }
+]

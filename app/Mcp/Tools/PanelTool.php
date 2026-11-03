@@ -16,6 +16,11 @@ abstract class PanelTool extends Tool
 {
     protected array $allowed = [];
 
+    public function description(): string
+    {
+        return __(parent::description());
+    }
+
     final public function handle(Request $request): Response
     {
         $grant = request()->attributes->get('mcp_grant');

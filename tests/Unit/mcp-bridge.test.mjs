@@ -14,6 +14,7 @@ async function runBridge(configuration, messages) {
     try {
         const child = spawn(process.execPath, ["bin/mcp-bridge.mjs", file], {
             cwd: process.cwd(),
+            env: { ...process.env, QOPENPANEL_LOCALE: "pt_BR" },
             stdio: ["pipe", "pipe", "pipe"],
         });
         let stdout = "",
